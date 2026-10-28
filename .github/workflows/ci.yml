@@ -168,8 +168,7 @@ jobs:
           test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
           # lintian stays advisory; findings are echoed as annotations so they are
           # readable without log access instead of being silenced with `|| true`
-          lintian --no-tag-display-limit -F '[tag] [extra][desc] ' dist/iris-theme_*.deb \
-            > /tmp/lintian.txt 2>&1 || true
+          lintian --tag-display-limit 0 dist/iris-theme_*.deb > /tmp/lintian.txt 2>&1 || true
           sed -n '1,20p' /tmp/lintian.txt | while IFS= read -r line; do
             printf '::warning::lintian: %s\n' "$(printf '%s' "$line" | sed 's/%/%25/g')"
           done
