@@ -389,9 +389,9 @@ placessidebar,
 .sidebar row,
 stacksidebar row,
 placessidebar row {
-    padding: 6px 8px;
-    border-radius: 10px;
-    min-height: 26px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    min-height: 30px;
 }
 
 .sidebar row:selected,
@@ -446,20 +446,31 @@ scale slider:hover {
 switch {
     background-color: rgba(150, 158, 170, 0.40);
     border-radius: 999px;
-    min-height: 20px;
-    padding: 2px;
+    min-height: 24px;
+    min-width: 44px;
+    padding: 3px;
 }
 
 switch slider {
     background-color: @iris_base;
     border-radius: 999px;
-    min-height: 16px;
-    min-width: 16px;
+    min-height: 18px;
+    min-width: 18px;
     box-shadow: 0 1px 3px 0 @iris_shadow;
 }
 
 switch:checked {
     background-color: @iris_accent;
+}
+
+/* M3 draws the knob slightly smaller than the track and lets the track carry the
+ * colour; :checked keeps the knob white so the state reads on a light surface. */
+switch:checked slider {
+    background-color: @iris_accent_fg;
+}
+
+switch:disabled {
+    opacity: 0.45;
 }
 
 checkbutton check,
@@ -584,4 +595,213 @@ statusbar {
 .nemo-desktop.nemo-desktop-icon-view,
 .nemo-desktop iconview {
     background-color: transparent;
+}
+
+/* ===== 13. cinnamon-settings (the Settings app) ==========================
+ * Every name below is read out of the widgets the app actually builds — not
+ * guessed. Sources (linuxmint/cinnamon, files/usr/share/cinnamon/cinnamon-settings/):
+ *   cinnamon-settings.ui  GtkBox#main_box > GtkToolbar#top_bar (style class
+ *                         `primary-toolbar`, set in the .ui) > GtkStack#header_stack
+ *                         > GtkEntry#search_box | GtkBox > GtkButton#button_back +
+ *                         GtkStackSwitcher#stack_switcher
+ *                       GtkStack#main_stack > GtkScrolledWindow#side_view_sw
+ *                         (classes `cs-category-view` + `view`, added in
+ *                         cinnamon-settings.py:280) > GtkViewport > GtkBox#category_box
+ *                                                       #content_box_sw > #content_box
+ *   cinnamon-settings.py  prepCategory(): per category a GtkSeparator, a GtkBox
+ *                         holding GtkImage + GtkLabel, then a GtkIconView whose
+ *                         items get GTK_STYLE_CLASS_CELL and :selected (Adwaita
+ *                         proves `iconview:selected { border-radius }` is the
+ *                         supported way to round a tile).
+ *   bin/SettingsWidgets.py CCModule names its page container `c_box`.
+ *   libXApp                XAppStackSidebar css name `stacksidebar`, adds
+ *                         `.sidebar` to the list and `.needs-attention` to rows;
+ *                         XAppPreferencesWindow uses `.frame` / `.view` /
+ *                         `text-button` on rows.
+ *
+ * LIMITATION (deliberate, and the reason this is a skin and not a fork): the
+ * Aluminium screenshot has a *persistent* left sidebar, but Cinnamon's home page
+ * is an IconView grid inside a stack that is replaced by the module page when you
+ * pick something (main_stack flips side_view_page <-> content_box_page). CSS can
+ * restyle the tiles, the header and the pills; it cannot move the layout into a
+ * permanent side pane. Doing that means patching cinnamon-settings.py — see
+ * docs/DESIGN.md "Settings app".
+ */
+
+/* The toolbar strip that holds search / tabs: aluminium, not a toolbar */
+#top_bar {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    padding: 6px 10px;
+}
+
+#top_bar:backdrop {
+    background-color: transparent;
+}
+
+/* pill search field, like the screenshot's "Search apps" */
+#search_box {
+    min-height: 34px;
+    padding: 2px 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.78);
+    background-image: none;
+    box-shadow: none;
+    color: @iris_fg;
+}
+
+#search_box:focus {
+    border-color: rgba(76, 127, 208, 0.55);
+    box-shadow: 0 0 0 3px rgba(76, 127, 208, 0.16);
+    background-color: @iris_base;
+}
+
+#search_box image,
+#search_box button {
+    color: @iris_fg_dim;
+}
+
+/* tabs of a module (Display / Effects / …) as one segmented pill */
+#stack_switcher {
+    padding: 2px;
+    border-radius: 999px;
+    background-color: rgba(150, 158, 170, 0.16);
+}
+
+#top_bar stackswitcher button {
+    min-height: 26px;
+    min-width: 90px;
+    padding: 2px 14px;
+    border: none;
+    border-radius: 999px;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    color: @iris_fg_dim;
+}
+
+#top_bar stackswitcher button:hover {
+    color: @iris_fg;
+    background-color: rgba(255, 255, 255, 0.55);
+}
+
+#top_bar stackswitcher button:checked {
+    background-color: rgba(76, 127, 208, 0.22);
+    color: @iris_fg;
+    box-shadow: inset 0 0 0 1px rgba(76, 127, 208, 0.35);
+}
+
+/* back button: circular ghost, not a bevelled button */
+#button_back {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    color: @iris_fg_dim;
+}
+
+#button_back:hover {
+    background-color: @iris_hover;
+    color: @iris_fg;
+}
+
+#button_back:active {
+    background-color: @iris_active;
+}
+
+/* home page: category headers, hairlines, and tiles that read as M3 list items */
+#category_box {
+    padding: 4px 6px 10px 6px;
+}
+
+#category_box > box > label {
+    font-weight: 600;
+    color: @iris_fg;
+    padding-left: 2px;
+}
+
+#category_box > box > image {
+    color: @iris_accent;
+}
+
+#category_box separator {
+    background-color: transparent;
+    min-height: 1px;
+    margin: 2px 8px;
+}
+
+#side_view_sw,
+.cs-category-view {
+    background-color: transparent;
+}
+
+#category_box iconview {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* The label carries the padding: IconView computes the item area from its cell
+ * renderers, so growing `text` grows the tile and its rounded selection. */
+#category_box iconview text {
+    color: @iris_fg;
+    padding: 8px 12px 10px 12px;
+}
+
+/* selected tile: tonal fill + ring, matching how M3 marks a chosen destination */
+#category_box iconview:selected {
+    background-color: rgba(76, 127, 208, 0.20);
+    border-radius: 20px;
+    color: @iris_fg;
+}
+
+/* module pages: give the content some air and a soft card behind the rows.
+ * `frame`/`list`/`row` are the generic nodes libXApp's group boxes end up using;
+ * nothing here depends on an app-private class name. */
+#content_box {
+    padding: 6px 10px 14px 10px;
+}
+
+#c_box {
+    padding: 4px 2px;
+}
+
+#content_box frame > border,
+#content_box frame {
+    border-radius: 18px;
+    border: 1px solid @iris_outline_soft;
+    background-color: rgba(255, 255, 255, 0.66);
+}
+
+#content_box row {
+    padding: 6px 10px;
+    min-height: 30px;
+}
+
+#content_box separator {
+    background-color: rgba(150, 158, 170, 0.22);
+    min-height: 1px;
+}
+
+/* app-wide: the section titles inside pages (label.dim-label via xapp rows) */
+#content_box label:disabled,
+#content_box .dim-label {
+    color: @iris_fg_dim;
+}
+
+/* xlet-settings (Applets/Desklets/Themes manager) reuses the same toolbar +
+ * stacksidebar idiom, so it inherits the header/tile treatment above. Its
+ * sidebar rows are plain `row`s inside `stacksidebar`. */
+stacksidebar row.needs-attention {
+    background-image: radial-gradient(circle closest-side at 6px 8px,
+        @iris_destructive 0%, @iris_destructive 100%, transparent 100%);
+    background-size: 12px;
+    background-repeat: no-repeat;
+    background-position: 2px 2px;
 }

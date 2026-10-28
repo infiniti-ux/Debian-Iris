@@ -84,6 +84,7 @@ Cinnamon dilewati dengan peringatan (bukan ditulis diem-diem jadi sampah dconf).
 |---|---|
 | Panel & menu blur/translucent | ✅ `background-blur` di `cinnamon.css` (properti St khusus Cinnamon, mahal — kecil-kecil saja) |
 | Sudut jendela membulat | ✅ lewat CSS GTK di node yang dibaca Muffin (`window.ssd decoration` + `headerbar`); **bukan** metacity XML, yang sudah tidak diparse Muffin sama sekali |
+| Settings app ("Search apps" + list row ala screenshot) | ✅ di-skin lewat hook yang diverifikasi dari sumber `cinnamon-settings` (`#top_bar`, `#search_box`, `#stack_switcher`, `#category_box`, `iconview:selected`) — tapi layout-nya tetap dua-level Cinnamon; sidebar permanen butuh patch Python / app sendiri, lihat `docs/DESIGN.md` §7 |
 | Blur di belakang jendela aplikasi | ❌ tidak ada jalur tema di Muffin; `picom` cuma X11 dan bentrok dengan compositor aktif. Alternatif opt-in: `gtk-3.0/gtk-translucent.css` (translucent, tanpa blur) |
 | Semua app GTK4/Adwaita ikut tema | ⚠️ sebagian; app libadwaita menarik palette sendiri |
 | Blur panel + radius besar + app window sekaligus, rata | itu Hyprland, yang di trixie cuma ada di `trixie-backports` — lihat opsi jalur di `docs/RESEARCH.md` §4 |
