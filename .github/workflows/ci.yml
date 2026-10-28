@@ -111,12 +111,30 @@ jobs:
             dpkg-dev debhelper devscripts make python3 lintian
 
       - name: build
-        run: dpkg-buildpackage -us -uc -b
+        run: |
+          set +e
+          dpkg-buildpackage -us -uc -b 2>&1 | tee /tmp/build.log
+          rc=${PIPESTATUS[0]}
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            # the raw log is on a host this environment cannot read, so mirror the
+            # interesting tail into the job summary, which the REST API does serve
+            {
+              echo '```'
+              grep -E 'dh_[a-z]+:|error|Error|dpkg-|make\[' /tmp/build.log | tail -n 50
+              echo '--- last 50 lines ---'
+              tail -n 50 /tmp/build.log
+              echo '```'
+            } > "$GITHUB_STEP_SUMMARY"
+            exit "$rc"
+          fi
 
       - name: inspect + lint
         run: |
           cd ..
-          dpkg -i iris-theme_*.deb
+          # --force-depends: the container does not have a desktop installed, and
+          # pulling in cinnamon just to satisfy Depends: would test nothing here.
+          dpkg -i --force-depends iris-theme_*.deb
           dpkg -L iris-theme | sed -n '1,40p'
           test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
           test -x /usr/bin/iris-apply-settings

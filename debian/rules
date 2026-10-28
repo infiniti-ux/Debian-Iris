@@ -15,9 +15,15 @@ override_dh_auto_test:
 
 override_dh_auto_install:
 
+# this tree carries far more than the theme package installs (scripts with side
+# effects, docs, the live-build profile, the Makefile). Listing the leftovers is
+# useful; --fail-missing would turn every deliberate omission into a build error.
+override_dh_missing:
+	dh_missing --list-missing
+
 execute_after_dh_install:
 	# keep the helpers executable; nothing here should ever gain a setuid bit
 	chmod 0755 debian/iris-theme/usr/share/iris/scripts/*.sh \
 	           debian/iris-theme/usr/share/iris/tools/*.py
 
-.PHONY: override_dh_auto_configure override_dh_auto_build override_dh_auto_test override_dh_auto_install
+.PHONY: override_dh_auto_configure override_dh_auto_build override_dh_auto_test override_dh_auto_install override_dh_missing
