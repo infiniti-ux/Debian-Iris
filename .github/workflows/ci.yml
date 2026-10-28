@@ -111,21 +111,22 @@ jobs:
             dpkg-dev debhelper devscripts make python3 lintian
 
       - name: build
+        # The raw log lives on a host that headless/sandboxed clients cannot always
+        # reach, so on failure the relevant lines are re-emitted as check-run
+        # annotations, which the REST API does serve.
         run: |
+          emit() { printf '::error::%s\n' "$(printf '%s' "$1" | sed 's/%/%25/g' | tr '\n\r' '| ' | cut -c1-300)"; }
           set +e
-          dpkg-buildpackage -us -uc -b 2>&1 | tee /tmp/build.log
-          rc=${PIPESTATUS[0]}
+          dpkg-buildpackage -us -uc -b > /tmp/build.log 2>&1
+          rc=$?
           set -e
+          cat /tmp/build.log
           if [ "$rc" -ne 0 ]; then
-            # the raw log is on a host this environment cannot read, so mirror the
-            # interesting tail into the job summary, which the REST API does serve
-            {
-              echo '```'
-              grep -E 'dh_[a-z]+:|error|Error|dpkg-|make\[' /tmp/build.log | tail -n 50
-              echo '--- last 50 lines ---'
-              tail -n 50 /tmp/build.log
-              echo '```'
-            } > "$GITHUB_STEP_SUMMARY"
+            for ln in $(seq 1 8); do
+              line=$(grep -nE 'error|Error|warning: |dh_[a-z]+:' /tmp/build.log | tail -n 8 | sed -n "${ln}p")
+              [ -n "$line" ] && emit "$line"
+            done
+            emit "TAIL: $(tail -n 6 /tmp/build.log | tr '\n' '|')"
             exit "$rc"
           fi
 
