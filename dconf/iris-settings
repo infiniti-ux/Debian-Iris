@@ -1,0 +1,46 @@
+# Dump konfigurasi dconf untuk Desktop Environment Iris (Aluminium OS inspired)
+# Muat dengan: dconf load /org/cinnamon/ < dconf/iris-settings
+# Atau jalankan scripts/install.sh yang akan mengaturnya otomatis.
+
+[org/cinnamon]
+theme='Iris'
+apps-panel-launches-with-super=true
+
+[org/cinnamon/desktop/interface]
+gtk-theme='Iris'
+icon-theme='Papirus-Dark'
+cursor-theme='Bibata-Modern-Classic'
+font-name='Sans 11'
+document-font-name='Sans 11'
+monospace-font-name='Monospace 11'
+color-scheme='prefer-dark'
+
+[org/cinnamon/desktop/wm/preferences]
+theme='Iris'
+titlebar-font='Sans Bold 11'
+action-double-click-titlebar='toggle-maximize'
+action-middle-click-titlebar='lower'
+action-right-click-titlebar='menu'
+
+[org/cinnamon/desktop/background]
+picture-uri='file:///usr/share/backgrounds/iris-aluminium.png'
+picture-options='zoom'
+primary-color='#2c3e50'
+secondary-color='#e0e0e0'
+show-desktop-icons=true
+show-desktop-icon-names=true
+
+[org/cinnamon/settings-daemon/plugins/xrandr]
+active=true
+
+[org/cinnamon/desktop/notifications]
+icon-size='large'
+
+[org/cinnamon/panels]
+panel-positions=['bottom:0']
+panel-heights=[40]
+
+[org/cinnamon/enabled-applets]
+enabled-applets=['panel1:left:0:menu@cinnamon.org', 'panel1:left:1:launchers@cinnamon.org', 'panel1:center:0:window-list@cinnamon.org', 'panel1:right:0:systray@cinnamon.org', 'panel1:right:1:clock@cinnamon.org']
+
+[org/cinnamon/applet-settings/menu@cinnamon.org]
