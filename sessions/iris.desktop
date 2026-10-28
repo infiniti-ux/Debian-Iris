@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Iris
+Comment=Debian Iris Desktop Environment (Cinnamon-based, Aluminium OS inspired)
+Exec=/usr/bin/cinnamon-session
+TryExec=/usr/bin/cinnamon-session
+Type=XSession
+DesktopNames=X-Cinnamon;

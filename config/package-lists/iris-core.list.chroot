@@ -1,0 +1,27 @@
+# Paket inti untuk Debian Iris Desktop Environment
+# Dikonfigurasi untuk live-build (config/package-lists/iris-core.list.chroot)
+
+# Cinnamon core (DE minimal: Muffin WM, Nemo, settings)
+cinnamon-core
+cinnamon-l10n
+cinnamon-settings-daemon
+
+# Display manager
+lightdm
+lightdm-gtk-greeter
+
+# X server & dasar
+xorg
+xserver-xorg-video-all
+xserver-xorg-input-all
+
+# Tema & tampilan aluminium
+papirus-icon-theme
+bibata-cursor-theme
+plymouth
+plymouth-theme-iris
+
+# Alat bantu
+nm-applet
+network-manager
+gpaste
