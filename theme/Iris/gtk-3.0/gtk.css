@@ -1,97 +1,587 @@
-/*
- * Iris GTK 3 theme — Aluminium OS inspired
- * Installed to: /usr/share/themes/Iris/gtk-3.0/gtk.css
- */
+/* =============================================================================
+ * Iris — GTK 3 theme for Debian Iris (Aluminium-inspired, light)
+ *
+ * Covers BOTH decoration paths used by Cinnamon/Muffin:
+ *   1. CSD  — apps drawing their own headerbar (gnome-terminal, nemo, …)
+ *   2. SSD  — Muffin drawing the frame for apps without CSD. Muffin builds a
+ *             GtkStyleContext from *this* CSS (see muffin src/ui/theme.c:
+ *             nodes `window.ssd` > `decoration` > `headerbar` > `label.title`
+ *             / `button.titlebutton`) and takes the corner radius from the
+ *             `border-radius` of the TITLEBAR node. So the radius has to be set
+ *             on both `decoration` and `headerbar` for the clip to line up.
+ *
+ * Deliberately avoided (they are what break real desktops):
+ *   - `* { font-size / font-family }`  -> blows up icon fonts, symbolic icons
+ *     and any widget that sizes itself from the font; CSD menus collapse.
+ *   - `!important`                    -> not valid in GTK CSS, ignored.
+ *   - translucent client backgrounds by default -> smearing in apps that skip
+ *     their own background draw. Opt in via gtk-translucent.css (see README).
+ * ===========================================================================*/
 
-* {
-    font-family: "Segoe UI", "Ubuntu", "Cantarell", "DejaVu Sans", sans-serif;
-    font-size: 13px;
+@define-color iris_window      #eef0f3;
+@define-color iris_surface     #f7f8fa;
+@define-color iris_base        #ffffff;
+@define-color iris_fg          #1f2430;
+@define-color iris_fg_dim      rgba(31, 36, 48, 0.65);
+@define-color iris_outline     #c6ccd4;
+@define-color iris_outline_soft rgba(150, 158, 170, 0.45);
+@define-color iris_hover       rgba(76, 127, 208, 0.12);
+@define-color iris_active      rgba(76, 127, 208, 0.22);
+@define-color iris_accent      #4c7fd0;
+@define-color iris_accent_fg   #ffffff;
+@define-color iris_destructive #d1534a;
+@define-color iris_shadow      rgba(40, 48, 62, 0.30);
+
+/* radii: 4 steps, M3-Expressive-ish. GTK CSS has no variables, so these are
+ * repeated literal values — change them with sed, not by hand. */
+
+/* ===== 1. Windows, frames, shadows ======================================= */
+window {
+    background-color: @iris_window;
+    color: @iris_fg;
+    font-family: "Inter", "Cantarell", "Segoe UI", "Ubuntu", sans-serif;
 }
 
-/* Jendela & frame */
-GtkWindow {
-    background-color: #f5f5f5;
+window.background.csd {
+    border-radius: 14px;
 }
 
-/* Tombol */
-button {
-    background-color: #e0e0e0;
-    color: #2c3e50;
-    border: 1px solid #bdbdbd;
-    border-radius: 6px;
-    padding: 6px 12px;
+/* CSD + SSD outer frame: this is where "rounded window" actually comes from */
+decoration {
+    border-radius: 14px;
+    background-color: @iris_window;
+    border: 1px solid @iris_outline;
+    margin: 10px;
+    box-shadow: 0 6px 18px 2px @iris_shadow;
+}
+
+decoration:backdrop {
+    box-shadow: 0 3px 10px 1px rgba(40, 48, 62, 0.22);
+    border-color: rgba(150, 158, 170, 0.55);
+}
+
+/* fullscreen / tiled windows must not keep a radius or a shadow */
+decoration:fullscreen,
+decoration.tiled,
+decoration.solid-csd {
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+}
+
+/* Muffin SSD chrome. The border-radius on `headerbar` is read by Muffin to
+ * clip the client area — keep it equal to the decoration radius. */
+window.ssd decoration {
+    border-radius: 14px 14px 14px 14px;
+    padding: 0;
+    background-color: @iris_window;
+}
+
+window.ssd headerbar.titlebar {
+    border-radius: 14px 14px 0 0;
+    min-height: 34px;
+    padding: 0 6px;
+    background-image: none;
+    background-color: @iris_surface;
+    border-bottom: 1px solid @iris_outline_soft;
+    box-shadow: none;
+}
+
+window.ssd headerbar.titlebar:backdrop {
+    background-color: rgba(247, 248, 250, 0.90);
+}
+
+window.ssd decoration:backdrop {
+    border-radius: 14px;
+}
+
+window.ssd headerbar.titlebar.default-decoration {
     min-height: 30px;
 }
 
+window.ssd decoration button.titlebutton {
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
+    margin: 2px;
+    border-radius: 999px;
+}
+
+/* ===== 2. Headerbars / titlebars (CSD) =================================== */
+headerbar,
+.titlebar {
+    min-height: 40px;
+    padding: 0 8px;
+    background-image: none;
+    background-color: @iris_surface;
+    color: @iris_fg;
+    border-bottom: 1px solid @iris_outline_soft;
+    box-shadow: none;
+}
+
+headerbar:backdrop,
+.titlebar:backdrop {
+    background-color: rgba(247, 248, 250, 0.92);
+    color: rgba(31, 36, 48, 0.72);
+}
+
+headerbar .title {
+    font-weight: bold;
+    font-size: 10.5pt;
+    color: @iris_fg;
+}
+
+headerbar .subtitle {
+    font-size: 8.5pt;
+    color: @iris_fg_dim;
+}
+
+headerbar button.titlebutton {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border-radius: 999px;
+}
+
+windowhandle box.titlebar-buttons,
+headerbar button.titlebutton.close:hover {
+    background-color: rgba(209, 83, 74, 0.22);
+}
+
+/* ===== 3. Buttons ======================================================== */
+button {
+    min-height: 24px;
+    min-width: 16px;
+    padding: 5px 12px;
+    margin: 1px;
+    border-radius: 10px;
+    border: 1px solid @iris_outline;
+    background-image: none;
+    background-color: @iris_base;
+    color: @iris_fg;
+    box-shadow: none;
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+}
+
 button:hover {
-    background-color: #d0d0d0;
-    border-color: #9e9e9e;
+    background-color: rgba(255, 255, 255, 0.92);
+    border-color: rgba(76, 127, 208, 0.45);
+    box-shadow: inset 0 0 0 999px @iris_hover;
 }
 
-button:active {
-    background-color: #c0c0c0;
+button:active,
+button:checked {
+    background-color: @iris_active;
+    border-color: rgba(76, 127, 208, 0.6);
 }
 
-/* Input teks */
-entry {
-    background-color: #ffffff;
-    color: #2c3e50;
-    border: 1px solid #bdbdbd;
-    border-radius: 6px;
-    padding: 6px 10px;
+button:disabled {
+    opacity: 0.5;
 }
 
-entry:focus {
-    border-color: #78a0dc;
+button.flat,
+button.text-button.flat {
+    border-color: transparent;
+    background-color: transparent;
 }
 
-/* Scrollbar */
+button.flat:hover {
+    background-color: @iris_hover;
+    box-shadow: none;
+}
+
+/* suggested / destructive actions */
+button.suggested-action {
+    background-color: @iris_accent;
+    border-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+button.destructive-action {
+    background-color: @iris_destructive;
+    border-color: @iris_destructive;
+    color: @iris_accent_fg;
+}
+
+button.image-button {
+    min-width: 22px;
+    padding: 4px;
+    border-radius: 999px;
+}
+
+/* toggle pill (view switchers) */
+button.toggle,
+.view switcher button {
+    border-radius: 999px;
+}
+
+/* ===== 4. Entries, spinbuttons, text ===================================== */
+entry,
+textview text,
+.view {
+    background-color: @iris_base;
+    color: @iris_fg;
+    border: 1px solid @iris_outline;
+    border-radius: 10px;
+    padding: 5px 10px;
+    min-height: 20px;
+    caret-color: @iris_accent;
+}
+
+entry:focus,
+textview text:focus {
+    border-color: @iris_accent;
+    box-shadow: inset 0 0 0 1px rgba(76, 127, 208, 0.35);
+}
+
+entry:disabled,
+textview text:disabled {
+    background-color: rgba(238, 240, 243, 0.8);
+    opacity: 0.7;
+}
+
+selection {
+    background-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+entry selection,
+textview text selection {
+    background-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+entry image {
+    color: @iris_fg_dim;
+}
+
+spinbutton {
+    border-radius: 10px;
+    border: 1px solid @iris_outline;
+    background-color: @iris_base;
+}
+
+spinbutton button {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+/* ===== 5. Lists, rows, trees ============================================ */
+treeview.view,
+list,
+list row {
+    background-color: transparent;
+    color: @iris_fg;
+}
+
+treeview.view:selected,
+list row:selected,
+row:selected {
+    background-color: @iris_active;
+    color: @iris_fg;
+}
+
+treeview.view:selected:backdrop {
+    background-color: rgba(76, 127, 208, 0.14);
+}
+
+treeview.view:hover,
+list row:hover {
+    background-color: @iris_hover;
+}
+
+row {
+    padding: 3px 6px;
+    border-radius: 8px;
+}
+
+/* ===== 6. Menus and popovers ============================================ */
+menu,
+.menu,
+.popup,
+.context-menu {
+    background-color: rgba(247, 248, 250, 0.98);
+    border: 1px solid @iris_outline;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 6px 22px 2px @iris_shadow;
+}
+
+menu menuitem,
+menuitem {
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: @iris_fg;
+}
+
+menu menuitem:hover,
+menuitem:hover {
+    background-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+menu separator,
+separator {
+    background-color: @iris_outline_soft;
+    min-height: 1px;
+    margin: 4px 2px;
+}
+
+popover,
+popover.background {
+    background-color: rgba(247, 248, 250, 0.98);
+    border: 1px solid @iris_outline;
+    border-radius: 14px;
+    padding: 8px;
+    box-shadow: 0 8px 26px 2px @iris_shadow;
+}
+
+popover > arrow {
+    background-color: rgba(247, 248, 250, 0.98);
+    border-color: @iris_outline;
+}
+
+/* ===== 7. Notebooks / tabs ============================================== */
+notebook > header {
+    background-color: transparent;
+}
+
+notebook > header > tabs > tab {
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: @iris_fg_dim;
+}
+
+notebook > header > tabs > tab:hover {
+    background-color: @iris_hover;
+}
+
+notebook > header > tabs > tab:checked {
+    background-color: @iris_base;
+    border-color: @iris_outline;
+    color: @iris_fg;
+}
+
+notebook > stack {
+    background-color: transparent;
+}
+
+/* ===== 8. Sidebars / navigation (the Aluminium "settings" look) ========= */
+paned > separator {
+    background-color: @iris_outline_soft;
+    min-width: 1px;
+}
+
+.sidebar,
+stacksidebar,
+placessidebar,
+.navigation-sidebar {
+    background-color: rgba(238, 240, 243, 0.92);
+    color: @iris_fg;
+    padding: 6px;
+}
+
+.sidebar row,
+stacksidebar row,
+placessidebar row {
+    padding: 6px 8px;
+    border-radius: 10px;
+    min-height: 26px;
+}
+
+.sidebar row:selected,
+stacksidebar row:selected,
+placessidebar row:selected {
+    background-color: rgba(76, 127, 208, 0.20);
+    color: @iris_fg;
+}
+
+.sidebar row:hover,
+placessidebar row:hover {
+    background-color: @iris_hover;
+}
+
+/* ===== 9. Progress, scale, level bars =================================== */
+progressbar,
+levelbar trough,
+scale trough {
+    background-color: rgba(150, 158, 170, 0.30);
+    border: none;
+    border-radius: 999px;
+    min-height: 6px;
+}
+
+progressbar progress,
+levelbar block.high,
+scale highlight {
+    background-color: @iris_accent;
+    border-radius: 999px;
+    min-height: 6px;
+}
+
+scale {
+    min-height: 16px;
+}
+
+scale slider {
+    min-width: 14px;
+    min-height: 14px;
+    margin: -6px;
+    border-radius: 999px;
+    background-color: @iris_base;
+    border: 1px solid @iris_outline;
+    box-shadow: 0 1px 3px 0 @iris_shadow;
+}
+
+scale slider:hover {
+    border-color: @iris_accent;
+}
+
+/* ===== 10. Switches / checks ============================================= */
+switch {
+    background-color: rgba(150, 158, 170, 0.40);
+    border-radius: 999px;
+    min-height: 20px;
+    padding: 2px;
+}
+
+switch slider {
+    background-color: @iris_base;
+    border-radius: 999px;
+    min-height: 16px;
+    min-width: 16px;
+    box-shadow: 0 1px 3px 0 @iris_shadow;
+}
+
+switch:checked {
+    background-color: @iris_accent;
+}
+
+checkbutton check,
+check {
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 5px;
+    border: 1px solid @iris_outline;
+    background-color: @iris_base;
+    color: @iris_accent_fg;
+}
+
+check:checked {
+    background-color: @iris_accent;
+    border-color: @iris_accent;
+    -gtk-icon-source: -gtk-icontheme("object-select-symbolic");
+}
+
+radiobutton radio,
+radio {
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 999px;
+    border: 1px solid @iris_outline;
+    background-color: @iris_base;
+}
+
+radio:checked {
+    background-color: @iris_accent;
+    border-color: @iris_accent;
+}
+
+/* ===== 11. Scrollbars (overlay style, thin pill) ========================= */
 scrollbar {
     background-color: transparent;
-    border-radius: 8px;
-    width: 12px;
+    border: none;
 }
 
+scrollbar overlay-indicator,
 scrollbar slider {
-    background-color: #bdbdbd;
+    background-color: rgba(90, 100, 115, 0.40);
+    border: none;
+    border-radius: 999px;
+    min-width: 6px;
+    min-height: 32px;
+    margin: 2px;
+}
+
+scrollbar slider:hover {
+    background-color: rgba(90, 100, 115, 0.60);
+}
+
+scrollbar.horizontal slider {
+    min-width: 32px;
+    min-height: 6px;
+}
+
+/* ===== 12. Status surfaces ============================================== */
+infobar,
+.info,
+.warning,
+.error {
+    padding: 8px 12px;
+    border-radius: 12px;
+    background-color: @iris_surface;
+    color: @iris_fg;
+    border: 1px solid @iris_outline_soft;
+}
+
+infobar.error,
+error {
+    background-color: rgba(209, 83, 74, 0.16);
+    border-color: rgba(209, 83, 74, 0.45);
+}
+
+infobar.warning {
+    background-color: rgba(205, 147, 9, 0.16);
+}
+
+tooltip {
+    background-color: rgba(31, 36, 48, 0.94);
+    color: #f2f4f7;
     border-radius: 8px;
-    min-width: 12px;
+    padding: 4px 8px;
+    box-shadow: none;
 }
 
-/* Menu */
-menu {
-    background-color: #ffffff;
-    border: 1px solid #bdbdbd;
-    border-radius: 8px;
+tooltip label {
+    color: #f2f4f7;
 }
 
-menuitem {
-    color: #2c3e50;
-    padding: 8px 16px;
+.osd,
+.osd frame {
+    background-color: rgba(247, 248, 250, 0.94);
+    color: @iris_fg;
+    border: 1px solid @iris_outline;
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow: 0 8px 26px 2px @iris_shadow;
 }
 
-menuitem:hover {
-    background-color: rgba(120, 160, 220, 0.15);
+.osd button {
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
-/* Notebook tabs */
-notebook tab {
-    background-color: #e0e0e0;
-    border-radius: 6px 6px 0 0;
-    padding: 8px 16px;
+statusbar {
+    background-color: transparent;
+    padding: 2px 6px;
 }
 
-notebook tab:active {
-    background-color: #ffffff;
+/* nemo / file-manager chrome */
+.nemo-window .nemo-window-pane widget.entry {
+    border-radius: 999px;
 }
 
-/* Sidebar / treeview */
-treeview {
-    background-color: #f5f5f5;
-    color: #2c3e50;
+.nemo-window .places-treeview {
+    -GtkTreeView-vertical-separator: 2;
 }
 
-treeview:selected {
-    background-color: #78a0dc;
-    color: #ffffff;
+/* desktop icons are drawn by nemo-desktop: keep the label legible on a light
+ * aluminium wallpaper */
+.nemo-desktop.nemo-desktop-icon-view,
+.nemo-desktop iconview {
+    background-color: transparent;
 }

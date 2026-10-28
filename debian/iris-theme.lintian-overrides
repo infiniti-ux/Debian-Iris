@@ -1,0 +1,4 @@
+# this package is data + a shell helper; there is no compiled program to manpage
+iris-theme: binary-without-manpage usr/bin/iris-apply-settings
+# shipped on purpose: session entries are the point of the package
+iris-theme: uses-of-gnome-icon-cache-missing *

@@ -1,0 +1,18 @@
+# Iris session definition (Wayland)
+#
+# Installed to: /usr/share/cinnamon-session/sessions/iris-wayland.session
+#
+# Requires the Cinnamon Wayland backend. On Debian 13 (trixie) Cinnamon 6.4.x
+# this session is still labelled experimental; it becomes fully supported with
+# Cinnamon 6.8. Keep it opt-in.
+#
+# KNOWN UPSTREAM TRAP (Debian bug #1147594, still open as of 2026-09):
+# cinnamon-common ships the Wayland session without depending on `xwayland`, so
+# the session comes up with a BLACK desktop — nemo-desktop is an X11 client and
+# dies with "Cannot open display". We therefore list xwayland in our package
+# lists / installer. Do not remove it.
+
+[Cinnamon Session]
+Name=Iris (Wayland)
+RequiredComponents=cinnamon-wayland;nemo-autostart;
+DesktopName=X-Cinnamon

@@ -1,44 +1,95 @@
-# Spesifikasi Desain — Debian Iris Desktop Environment
+# DESIGN — spesifikasi Iris skin
 
-## Base
-- **OS:** Debian 13 (trixie) amd64
-- **Desktop Environment:** Cinnamon (core) + Muffin window manager
-- **Display Manager:** LightDM
-- **Session name:** `iris` (tampilkan sebagai "Iris" di layar login)
+Target: **Debian 13 (trixie) + Cinnamon 6.4.1**, naik-lurus ke Cinnamon 6.8 (Debian 14) tanpa
+perubahan arsitektur. Rujukan visual: bahasa desain Material 3 Expressive seperti yang dipakai
+Google di laptop Android-nya — radius besar, permukaan nada aluminium, satu aksen biru,
+taskbar bawah melayang. Kita meniru **bahasa visual**, bukan produk atau asetnya
+(lihat `docs/RESEARCH.md` §5).
 
-## Visual Reference — Aluminium OS (leaked)
-Referensi utama: screenshot settings panel Aluminium OS yang ditempatkan di `image-search/google-aluminum-os-desktop-interface-chr-1.jpg`.
+## 1. Token
 
-Ciri khas yang diadopsi:
-- Window / panel dengan **rounded corners** dan translucency (glassmorphism)
-- Warna dominan: abu-abu metalic (aluminium), background gradasi muda, accent biru soft
-- Sidebar kiri di Settings (Network, Bluetooth, Account, Device, Apps, dll.)
-- **Panel bawah berbentuk Windows taskbar** (bukan dock macOS): tombol Start/menu kiri, taskbar tengah, sistem tray + jam di kanan
+GTK3 CSS mendukung `@define-color`, jadi palet didefinisikan di sana.
+**St/Cinnamon CSS tidak mendukungnya** → `cinnamon.css` menulis nilai literal; kalau warna
+diubah, keduanya harus disinkronkan manual (sengaja, bukan kelalaian).
 
-## Komponen yang Dikustomisasi
-
-| Komponen | Lokasi | Kustomisasi |
+| Token | Nilai | Dipakai untuk |
 |---|---|---|
-| Cinnamon panel (taskbar bawah) | `theme/cinnamon/cinnamon.css` | Windows-style taskbar, tinggi 40px, bg abu-abu metalic, rounded corners |
-| GTK controls (tombol, input) | `theme/iris-gtk/gtk-3.0/gtk.css` | Warna aluminium, rounded input/button |
-| Window borders (Muffin) | `theme/iris-muffin/metacity-theme-3.xml` | Border tipis, tombol minim/maximal/close ala modern |
-| Icon theme | `theme/icons/` | Papirus/Bibata-based, konsisten aluminium |
-| Cursor | Bibata-Modern-Classic | Sudah ada di Debian repositori |
-| Wallpaper default | `theme/wallpapers/` | Gradasi aluminium/pastel |
-| Plymouth bootsplash | `config/includes.chroot/usr/share/plymouth/themes/iris/` | Boot splash Iris |
-| Session file | `sessions/iris.desktop` | Muncul di LightDM sebagai "Iris" |
+| `iris_window` | `#eef0f3` | latar jendela, panel dasar |
+| `iris_surface` | `#f7f8fa` | headerbar/titlebar, menu |
+| `iris_base` | `#ffffff` | entry, tombol, list |
+| `iris_fg` | `#1f2430` | teks utama (kontras > 7:1 di atas semua latar ini) |
+| `iris_outline` | `#c6ccd4` | garis tepi 1px |
+| `iris_accent` | `#4c7fd0` | fokus, seleksi, "pill" aktif, garis bawah taskbar item |
+| `iris_destructive` | `#d1534a` | hover tombol close |
+| `iris_shadow` | `rgba(40,48,62,.30)` | drop shadow window/menu |
 
-## Panel Taskbar (Windows-style)
-Berdasarkan referensi screenshot, panel bawah harus:
-1. Posisi: bawah layar
-2. Tinggi: 40px
-3. Zona kiri: Menu Iris (Cinnamon menu), peluncur aplikasi
-4. Tengah: daftar jendela terbuka (window list)
-5. Kanan: sistem tray, jam, tanggal
-6. Visual: bg `rgba(220, 220, 220, 0.85)`, border-radius 12px pada sudut atas, sedikit transparansi
+Radius: `14px` window/frame · `12px` control (button/entry) · `16-18px` panel/menu/OSD ·
+`999px` pill (titlebutton, search, toggle, badge).
+Tebal garis: 1px, kecuali indikator aktif taskbar 2px.
 
-## Session File
-File `sessions/iris.desktop` akan diinstall ke `/usr/share/xsessions/iris.desktop` sehingga opsi "Iris" muncul di layar login LightDM/GDM3.
+## 2. Permukaan & efek
 
-## Build (Opsional)
-Jika ingin menghasilkan ISO installable, gunakan `live-build` dengan struktur di `config/`.
+| Permukaan | File | Efek | Catatan |
+|---|---|---|---|
+| Panel bawah | `cinnamon/cinnamon.css` `.panel-bottom` | `rgba(236,238,241,.78)` + `background-blur: 14`, radius 18, margin 8 → melayang | blur di sini yang paling mahal; kalau frame rate turun saat jendela lewat, turunkan ke `background-blur: 6` atau hapus |
+| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 16, search pill | `background-blur` itu parse int, jadi `12` bukan `12px` |
+| Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 16 | permukaan statis → aman |
+| Frame window (SSD) | `gtk-3.0/gtk.css` `window.ssd decoration` + `window.ssd headerbar.titlebar` | radius 14 di **kedua** node, shadow, titlebutton bulat | Muffin membaca radius dari titlebar (lihat `docs/SAFETY.md` §3) |
+| Headerbar CSD | `gtk-3.0/gtk.css` `headerbar` | permukaan datar, border bawah tipis | untuk app GTK yang menggambar titlebar sendiri |
+| Window "glass" | `gtk-3.0/gtk-translucent.css` (opt-in) | translucent, **tanpa** blur | sadar batas: ini palsu; beberapa app akan smear |
+
+Yang **tidak** dijanjikan: blur dinamis di bawah jendela app, shape morphing, motion physics,
+dynamic color dari wallpaper. Tidak ada jalur tema untuk itu di Muffin; butuh fork C++ di
+`muffin` (level 3 di `docs/RESEARCH.md` §3) — sengaja tidak dilakukan.
+
+## 3. Tata letak panel (Windows-style, lihat `config/gsettings/iris.gsettings`)
+
+```
+[1:0:bottom]  tinggi 44px
+  left   : menu@cinnamon.org · separator · panel-launchers@cinnamon.org
+  center : window-list@cinnamon.org
+  right  : systray · xapp-status · notifications · keyboard · network · sound · power
+           · calendar · cornerbar(show-desktop)
+```
+Semua UUID di atas ada di `files/usr/share/cinnamon/applets/` Cinnamon 6.4.
+Format: `panels-enabled=['1:0:bottom']`, `panels-height=['1:44']`,
+`enabled-applets=['panel1:<zone>:<idx>:<uuid>', ...]`.
+
+## 4. Sesi
+
+- `iris.session` → `/usr/share/cinnamon-session/sessions/` (grup `[Cinnamon Session]`,
+  `RequiredComponents=cinnamon;nemo-autostart;cinnamon-killer-daemon;`, `DesktopName=X-Cinnamon`).
+- `iris.desktop` → `/usr/share/xsessions/`, `Exec=cinnamon-session --session iris`.
+- Varian Wayland (`iris-wayland.*`) di-install **hanya** dengan `--with-session`, dan butuh
+  `xwayland`.
+
+`DesktopName` tidak boleh jadi `X-Iris`: komponen autostart Cinnamon ber-`OnlyShowIn=X-Cinnamon`.
+
+## 5. Struktur file
+
+```
+theme/Iris/index.theme                    metatheme [X-GNOME-Metatheme]: GtkTheme/IconTheme/ButtonLayout
+theme/Iris/cinnamon/cinnamon.css          shell St theme (satu-satunya tempat blur bisa dipakai)
+theme/Iris/gtk-3.0/gtk.css                app + Muffin SSD frames
+theme/Iris/gtk-3.0/gtk-translucent.css    opt-in translucent
+theme/Iris/gtk-4.0/gtk.css                app GTK4 (bukan frame SSD — itu selalu dari gtk-3.0)
+config/gsettings/iris.gsettings           profil tersetujui-schema
+config/package-lists/iris-core.list.chroot daftar paket (live-build + --packages)
+scripts/install.sh · uninstall.sh · apply-settings.sh · lib/common.sh
+sessions/*.desktop · sessions/*.session   opsi "Iris" di layar login
+tools/check-theme.py · gen-selectors.py   gerbang kualitas (make check)
+debian/                                   .deb = cara install yang sebenarnya
+```
+
+## 6. Konvensi yang dijaga CI
+
+1. Tidak ada nama selector di `cinnamon.css` yang tidak ada di `tools/upstream-selectors.txt`
+   (+ `verified-selectors.txt` dengan bukti).
+2. Tidak ada `@define-color`/`var()`/`!important`/`backdrop-filter` di `cinnamon.css`; tidak ada
+   `* {}` global di gtk CSS; tidak ada `alpha(r,g,b,a)` (harus `rgba()`).
+3. Tidak ada `metacity-1/`, `gnome-shell/`, atau direktori tema mati lain.
+4. `index.theme` wajib punya `[X-GNOME-Metatheme]`.
+5. `.session` wajib `DesktopName=X-Cinnamon`; `.desktop` wajib punya `--session <nama>` di Exec.
+6. `config/gsettings/*` hanya berisi schema/key yang dikenal; key yang terbukti tidak ada di
+   upstream ditolak sebagai error.
+7. Nama paket di `config/package-lists/*` harus benar-benar ada di arsip Debian.

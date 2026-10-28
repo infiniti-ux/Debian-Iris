@@ -1,0 +1,16 @@
+# NOTE: scripts/install.sh and scripts/uninstall.sh are intentionally NOT
+# shipped — for users of the .deb, dpkg itself is the installer/remover. The
+# scripts exist for the "git clone and try it" path only.
+theme/Iris                    usr/share/themes/
+wallpapers/*                  usr/share/backgrounds/
+config/gsettings/*            usr/share/iris/config/gsettings/
+scripts/apply-settings.sh     usr/share/iris/scripts/
+scripts/lib/*                 usr/share/iris/scripts/lib/
+tools/check-theme.py          usr/share/iris/tools/
+tools/gen-selectors.py        usr/share/iris/tools/
+tools/upstream-selectors.txt  usr/share/iris/tools/
+tools/verified-selectors.txt  usr/share/iris/tools/
+sessions/iris.desktop                 usr/share/xsessions/
+sessions/iris-wayland.desktop         usr/share/wayland-sessions/
+sessions/iris.session                 usr/share/cinnamon-session/sessions/
+sessions/iris-wayland.session         usr/share/cinnamon-session/sessions/

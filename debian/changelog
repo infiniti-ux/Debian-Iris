@@ -1,0 +1,29 @@
+iris-desktop-skin (0.2.0) unstable; urgency=medium
+
+  * Skin rewrite against upstream sources; removal of the destructive config set.
+  * theme/Iris/cinnamon/cinnamon.css: rebuilt using only selector names that
+    Cinnamon actually defines (the previous file styled 6 non-existent classes,
+    so the panel rules were inert) and St-correct properties: background-blur,
+    border-radius-topleft (not border-top-left-radius).
+  * theme/Iris/gtk-3.0/gtk.css: SSD window frames now styled through the nodes
+    Muffin really reads (window.ssd > decoration > headerbar), including the
+    titlebar border-radius Muffin uses to clip corners.
+  * theme/Iris/metacity-1/metacity-theme-3.xml: REMOVED. Muffin has no metacity
+    XML parser; the file could never have had any effect.
+  * dconf/iris-settings: REMOVED and replaced by config/gsettings/iris.gsettings
+    + scripts/apply-settings.sh, which validates every schema/key against the
+    installed schemas and backs up previous values. The old file wrote keys that
+    do not exist (org.cinnamon theme, panel-positions, panel-heights,
+    desktop.interface color-scheme/document-font-name, background
+    show-desktop-icons, notifications icon-size) and used two applet UUIDs that
+    are not Cinnamon applets.
+  * scripts/install.sh: no longer overwrites /etc/lightdm/lightdm.conf, no longer
+    installs a plymouth theme, no longer runs apt or writes dconf by default, and
+    refuses to replace a desktop while a graphical session is live. Manifest +
+    ownership marker so uninstall is exact instead of `rm -rf`.
+  * config/package-lists/iris-core.list.chroot: dropped the non-existent
+    plymouth-theme-iris / nm-applet / gpaste entries (they failed `lb build`) and
+    added the required xwayland dependency for the Wayland session.
+  * tools/check-theme.py + CI: static gate for the whole class of problems above.
+
+ -- infiniti-ux <noreply@localhost>  Tue, 28 Oct 2026 14:30:00 +0700

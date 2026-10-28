@@ -1,0 +1,57 @@
+/* =============================================================================
+ * Iris — OPTIONAL translucent surfaces (opt-in, NOT enabled by default)
+ *
+ * Why this is opt-in:
+ * GTK has no backdrop blur. Making `window`/`decoration` translucent and
+ * letting the compositor blur what is behind it is exactly what KDE/Windows
+ * can do, but Muffin (Cinnamon's WM) has no blur plugin API for client
+ * windows, and Cinnamon's own `background-blur` only applies to Cinnamon's
+ * St actors (panel, menus, OSD) — not to application windows.
+ *
+ * So on Debian 13 + Cinnamon you get, realistically:
+ *   - real glass on shell surfaces      -> already in cinnamon.css (background-blur)
+ *   - "fake glass" on app windows        -> translucent paint, wallpaper shows
+ *     through, no blur. Text stays readable only because we also dim/darken
+ *     the surface. Some apps (GTK2-in-xwayland, electron, SDL) do not paint a
+ *     background at all and will smear.
+ *
+ * To enable, as the desktop user:
+ *   mkdir -p ~/.config/gtk-3.0
+ *   printf '@import url("/usr/share/themes/Iris/gtk-3.0/gtk-translucent.css");\n' \
+ *     > ~/.config/gtk-3.0/gtk.css
+ * Revert with: rm ~/.config/gtk-3.0/gtk.css
+ * ===========================================================================*/
+
+window.ssd decoration,
+window.csd decoration {
+    background-color: rgba(238, 240, 243, 0.82);
+}
+
+window.ssd headerbar.titlebar,
+headerbar,
+.titlebar {
+    background-color: rgba(247, 248, 250, 0.62);
+}
+
+/* Content areas keep a nearly opaque layer so text is never on raw wallpaper. */
+.background,
+.view {
+    background-color: rgba(247, 248, 250, 0.88);
+}
+
+stack,
+box,
+grid {
+    background-color: transparent;
+}
+
+menu,
+popover contents,
+.popup {
+    background-color: rgba(247, 248, 250, 0.86);
+}
+
+entry,
+textview text {
+    background-color: rgba(255, 255, 255, 0.72);
+}

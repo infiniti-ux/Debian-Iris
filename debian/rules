@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+# Iris ships data + scripts only; nothing to compile.
+%:
+	dh $@
+
+override_dh_auto_test:
+	$(MAKE) check
+
+execute_after_dh_install:
+	# scripts must stay executable and must not silently gain setuid bits
+	chmod 0755 debian/iris-theme/usr/share/iris/scripts/*.sh \
+	           debian/iris-theme/usr/share/iris/tools/*.py 2>/dev/null || true

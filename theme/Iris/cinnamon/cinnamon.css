@@ -1,84 +1,808 @@
-/*
- * Iris Desktop Environment — Cinnamon Panel CSS
- * Windows-style taskbar, Aluminium OS inspired
- * Installed to: /usr/share/themes/Iris/cinnamon/cinnamon.css
+/* =============================================================================
+ * Iris — Cinnamon shell theme (St/Clutter CSS)
+ * Target: Cinnamon 6.4.x (Debian 13 "trixie"), verified against upstream
+ *         linuxmint/cinnamon `data/theme/cinnamon-sass/` class names.
+ *
+ * HARD CONSTRAINTS of Cinnamon's St CSS engine (unlike web CSS and unlike GTK):
+ *   - NO @define-color, NO var(), NO functions like mix()/transparentize().
+ *   - NO `!important`, NO `transition`, NO `backdrop-filter`.
+ *   - Per-corner radius is `border-radius-topleft|topright|bottomleft|bottomright`,
+ *     NOT `border-top-left-radius` (that name does not exist in St).
+ *   - Blur is the St-only property `background-blur: <int>` (radius in px).
+ *     It is real but expensive: Cinnamon blurs by re-reading the scene, so keep
+ *     it small, use it only on surfaces that sit over the wallpaper, and turn it
+ *     off on the panel if a window moving behind it costs frames.
+ *
+ * Style guide: light aluminium surfaces, 14-22px radii, thin cool-grey borders,
+ * single soft blue accent (#4C7FD0).
+ * ===========================================================================*/
+
+/* ===== 0. Root / stage ==================================================== */
+stage {
+    font-size: 10.5pt;
+}
+
+.label {
+    color: #1f2430;
+}
+
+/* Scrollbars inside Cinnamon surfaces (menus, notification list) */
+StScrollView.vfade {
+    -st-vfade-offset: 48px;
+}
+
+StScrollView.hfade {
+    -st-hfade-offset: 48px;
+}
+
+StScrollBar {
+    padding: 2px;
+}
+
+StScrollBar StButton#vhandle,
+StScrollBar StButton#hhandle {
+    background-color: rgba(90, 100, 115, 0.35);
+    border-radius: 8px;
+}
+
+StScrollBar StButton#vhandle:hover,
+StScrollBar StButton#hhandle:hover {
+    background-color: rgba(90, 100, 115, 0.55);
+}
+
+/* ===== 1. Panel (floating Windows-11 style taskbar at the bottom) ========= */
+.panel {
+    font-size: 10pt;
+    font-weight: normal;
+    color: #1f2430;
+    /* translucent aluminium slab; the blur is what makes it read as "glass" */
+    background-color: rgba(236, 238, 241, 0.78);
+    background-blur: 14;
+    border: 1px solid rgba(190, 196, 205, 0.85);
+}
+
+.panel-top {
+    border-radius: 0 0 18px 18px;
+    border-top-width: 0;
+}
+
+.panel-bottom {
+    /* floating bar: the margins are what detach it from the screen edge */
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border-radius: 18px;
+    border-bottom-width: 0;
+    box-shadow: 0 -1px 10px 0 rgba(40, 48, 62, 0.14);
+}
+
+.panel-left {
+    border-radius: 0 18px 18px 0;
+    border-left-width: 0;
+}
+
+.panel-right {
+    border-radius: 18px 0 0 18px;
+    border-right-width: 0;
+}
+
+/* For a classic full-width bar instead of the floating pill, zero the margins:
+ *   .panel-bottom { margin: 0; border-radius: 0; }
  */
 
-/* ===== Panel dasar (taskbar bawah) ===== */
-.panel {
+#panel {
+    color: #1f2430;
+}
+
+/* shown by cinnamon-settings when a specific panel is being edited */
+#panel:highlight {
+    background-color: rgba(228, 112, 91, 0.30);
+}
+
+#panelLeft,
+#panelCenter,
+#panelRight {
+    spacing: 2px;
+}
+
+#panelLeft:dnd,
+#panelCenter:dnd,
+#panelRight:dnd {
+    background-color: rgba(76, 127, 208, 0.18);
+}
+
+.panel-corner {
+    background-color: transparent;
+}
+
+/* ===== 2. Applets (generic) =============================================== */
+.applet-box {
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: #1f2430;
     font-weight: normal;
-    background-color: rgba(220, 220, 220, 0.88);
-    color: #2c3e50;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    height: 40px;
+}
+
+.applet-box:hover {
+    background-color: rgba(76, 127, 208, 0.14);
+}
+
+.applet-box:checked,
+.applet-box:focus {
+    background-color: rgba(76, 127, 208, 0.22);
+}
+
+.applet-box:highlight {
+    background-color: rgba(228, 112, 91, 0.28);
+}
+
+.applet-icon {
+    icon-size: 22px;
+    color: #1f2430;
+}
+
+.applet-label {
+    font-size: 10pt;
+    color: #1f2430;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.applet-separator {
+    width: 1px;
+    padding: 0;
+}
+
+.applet-separator-line {
+    width: 1px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background-color: rgba(150, 158, 170, 0.55);
+}
+
+.spacer-box {
+    border-color: transparent;
+}
+
+/* ===== 3. Panel launchers (the pinned-app row, left of taskbar) ========== */
+.panel-launchers,
+.launcher {
     spacing: 4px;
 }
 
-/* Panel di bawah layar */
-.panel-bottom {
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+.launcher .applet-box {
+    padding: 5px;
+    border-radius: 14px;
 }
 
-/* ===== Window list (daftar jendela, tengah taskbar) ===== */
-.window-list {
+/* ===== 4. Window list (running apps, centre of the taskbar) ============== */
+.window-list,
+.grouped-window-list {
+    spacing: 4px;
+}
+
+.window-list-item-box,
+.grouped-window-list-item-box {
+    padding: 4px 10px;
+    margin: 3px 1px;
+    border-radius: 12px;
+    color: #1f2430;
+    border: 1px solid transparent;
+    border-bottom-width: 2px;
+}
+
+.window-list-item-box:hover,
+.grouped-window-list-item-box:hover {
+    background-color: rgba(76, 127, 208, 0.14);
+}
+
+.window-list-item-box:focus,
+.grouped-window-list-item-box:focus {
+    background-color: rgba(255, 255, 255, 0.60);
+    border-color: rgba(76, 127, 208, 0.55);
+}
+
+.window-list-item-box:active,
+.grouped-window-list-item-box:active,
+.grouped-window-list-item-box:checked {
+    background-color: rgba(255, 255, 255, 0.45);
+    border-bottom-color: #4c7fd0;
+}
+
+.window-list-item-box.top,
+.grouped-window-list-item-box.top {
+    border-bottom-width: 0;
+    border-top-width: 2px;
+}
+
+.grouped-window-list-item-label {
+    width: 15em;
+    min-width: 5px;
+    font-size: 9.5pt;
+}
+
+.grouped-window-list-badge {
+    border-radius: 99px;
+    background-color: rgba(31, 36, 48, 0.85);
+    color: #ffffff;
+}
+
+.grouped-window-list-number-label,
+.grouped-window-list-button-label {
+    font-size: 8pt;
+    padding: 1px 5px;
+}
+
+.grouped-window-list-item-demands-attention {
+    background-color: rgba(228, 112, 91, 0.30);
+}
+
+/* thumbnail hover menu over a taskbar button */
+.grouped-window-list-thumbnail-menu,
+.popup-menu-content.grouped-window-list-thumbnail-menu {
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 16px;
+    background-color: rgba(246, 247, 249, 0.92);
+    background-blur: 10;
+    box-shadow: 0 4px 18px 0 rgba(40, 48, 62, 0.20);
+    padding: 6px;
+}
+
+.thumbnail-box {
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.thumbnail-box:hover {
+    background-color: rgba(76, 127, 208, 0.16);
+}
+
+.thumbnail {
+    border: 1px solid rgba(150, 158, 170, 0.6);
+    border-radius: 6px;
+}
+
+/* ===== 5. Menus (start menu, applet dropdowns, calendar) ================= */
+.popup-menu-content {
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 16px;
+    background-color: rgba(246, 247, 249, 0.90);
+    background-blur: 12;
+    box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.22);
+    padding: 8px;
+    color: #1f2430;
+}
+
+.popup-menu-item {
+    padding: 6px 12px;
+    border-radius: 10px;
+    spacing: 8px;
+    color: #1f2430;
+}
+
+.popup-menu-item:hover,
+.popup-menu-item:focus,
+.popup-menu-item:selected {
+    background-color: rgba(76, 127, 208, 0.18);
+}
+
+.popup-menu-item:active {
+    background-color: rgba(76, 127, 208, 0.30);
+}
+
+.popup-menu-icon {
+    icon-size: 16px;
+}
+
+.popup-menu-arrow {
+    icon-size: 12px;
+    color: rgba(31, 36, 48, 0.6);
+}
+
+.popup-inactive-menu-item {
+    color: rgba(31, 36, 48, 0.55);
+}
+
+.popup-separator-menu-item {
+    height: 1px;
+    margin: 6px 4px;
+    background-color: rgba(150, 158, 170, 0.45);
+}
+
+.popup-sub-menu {
+    padding-left: 8px;
+    background-color: rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+}
+
+.popup-combo-menu {
+    padding: 8px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 14px;
+    background-color: rgba(246, 247, 249, 0.94);
+}
+
+.popup-slider-menu-item {
+    height: 14px;
+    -slider-height: 4px;
+    -slider-background-color: rgba(150, 158, 170, 0.45);
+    -slider-border-color: transparent;
+    -slider-active-background-color: #4c7fd0;
+    -slider-active-border-color: transparent;
+    -slider-handle-border-width: 1px;
+    -slider-handle-border-color: rgba(190, 196, 205, 0.9);
+    -slider-handle-background-color: #ffffff;
+    color: #1f2430;
+}
+
+/* the start menu itself (menu@cinnamon.org / Cinnamenu) */
+.menu {
+    border-radius: 16px;
+}
+
+#menu-search-entry,
+#appmenu-search-entry {
+    width: 22em;
+    padding: 7px 12px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.85);
+    color: #1f2430;
+    font-size: 10pt;
+    selected-color: #ffffff;
+    selection-background-color: #4c7fd0;
+}
+
+#menu-search-entry:focus,
+#appmenu-search-entry:focus {
+    border-color: #4c7fd0;
+    background-color: #ffffff;
+}
+
+.menu-search-entry-icon {
+    icon-size: 16px;
+    color: rgba(31, 36, 48, 0.55);
+}
+
+.appmenu-application-button,
+.appmenu-category-button {
+    padding: 6px 8px;
+    border-radius: 10px;
+    color: #1f2430;
+}
+
+.appmenu-application-button:hover,
+.appmenu-application-button-selected,
+.appmenu-category-button:hover,
+.appmenu-category-button-selected {
+    background-color: rgba(76, 127, 208, 0.18);
+}
+
+.appmenu-application-button-label,
+.appmenu-category-button-label {
+    font-size: 9.5pt;
+    padding-left: 4px;
+}
+
+.appmenu-system-button {
+    border-radius: 99px;
+    padding: 6px;
+}
+
+.appmenu-system-button:hover {
+    background-color: rgba(76, 127, 208, 0.18);
+}
+
+/* ===== 6. Calendar / clock applet ========================================
+ * Names come from cinnamon's own widgets/_calendar.scss: the nesting parent is
+ * `.calendar`, so the runtime classes are `.calendar-day-base`, `.calendar-today`,
+ * `.calendar-not-today`, `.calendar-other-month-day`, `.calendar-events-date-label`.
+ * (`.calendar-day-selected` / `.datemenu-*` do not exist — those are GNOME's.)
+ */
+.clock-widget {
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.clock-time-label {
+    font-size: 10pt;
+    color: #1f2430;
+}
+
+.clock-date-label {
+    font-size: 9pt;
+    color: rgba(31, 36, 48, 0.65);
+}
+
+.calendar {
+    spacing-rows: 2px;
+    spacing-columns: 2px;
+}
+
+.calendar-main-box {
+    margin: 8px;
+}
+
+.calendar-day-base {
+    text-align: center;
+    width: 2.4em;
+    height: 2.4em;
+    font-size: 9pt;
+    border-radius: 9999px;
+    color: rgba(31, 36, 48, 0.75);
+}
+
+.calendar-day-base:hover {
+    background-color: rgba(76, 127, 208, 0.16);
+    color: #1f2430;
+}
+
+.calendar-day-heading {
+    font-size: 8.5pt;
+    color: rgba(31, 36, 48, 0.6);
+    height: 1.6em;
+}
+
+/* today */
+.calendar-today {
+    box-shadow: inset 0 0 0 2px #4c7fd0;
+    background-color: rgba(76, 127, 208, 0.16);
+    color: #1f2430;
+}
+
+/* the day the user clicked */
+.calendar-not-today:selected {
+    background-color: #4c7fd0;
+    color: #ffffff;
+}
+
+.calendar-other-month-day {
+    color: rgba(31, 36, 48, 0.35);
+}
+
+.calendar-work-day,
+.calendar-nonwork-day {
+    color: #1f2430;
+}
+
+.calendar-month-label {
+    font-size: 10.5pt;
+    font-weight: bold;
+    color: #1f2430;
+}
+
+.calendar-events-date-label {
+    font-size: 11pt;
+    font-weight: bold;
+}
+
+.calendar-events-main-box {
+    min-width: 340px;
+    height: 260px;
+    border-right-width: 1px;
+    border-color: rgba(150, 158, 170, 0.45);
+}
+
+.calendar-change-month-back,
+.calendar-change-month-forward {
+    padding: 2px 6px;
+    border-radius: 8px;
+}
+
+.calendar-change-month-back:hover,
+.calendar-change-month-forward:hover {
+    background-color: rgba(76, 127, 208, 0.16);
+}
+
+/* media player box (notifications/calendar applet) */
+.sound-player {
+    padding: 6px;
+    border-radius: 12px;
+}
+
+.albumart-widget,
+.albumart-album,
+.albumart-track-info-box {
+    border-radius: 10px;
     spacing: 6px;
 }
 
-.window-list-item {
-    padding: 5px 12px;
-    border-radius: 7px;
-    margin: 3px 2px;
-    color: #2c3e50;
+.albumart-title {
+    font-weight: bold;
 }
 
-.window-list-item:active,
-.window-list-item:checked {
-    background-color: rgba(120, 160, 220, 0.35);
-    border-radius: 7px;
+.albumart-artist,
+.albumart-controls {
+    color: rgba(31, 36, 48, 0.7);
 }
 
-.window-list-item:hover {
-    background-color: rgba(120, 160, 220, 0.15);
+/* user menu inside the calendar */
+.user-widget-label {
+    font-size: 11pt;
+    font-weight: bold;
 }
 
-/* ===== Menu tombol (Start, kiri taskbar) ===== */
-.menu-button {
+.user-icon {
+    padding: 8px;
+    border-radius: 99px;
+}
+
+/* ===== 7. Notifications =================================================== */
+.notification,
+#notification {
+    width: 28em;
+    padding: 10px 12px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 16px;
+    background-color: rgba(246, 247, 249, 0.90);
+    background-blur: 12;
+    box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.20);
+    color: #1f2430;
+    spacing: 6px;
+}
+
+#notification StLabel,
+.notification StLabel {
+    color: #1f2430;
+}
+
+.notification-icon-button,
+.notification-button {
+    border-radius: 99px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    background-color: rgba(255, 255, 255, 0.55);
+    color: #1f2430;
+}
+
+.notification-icon-button:hover,
+.notification-button:hover {
+    background-color: rgba(76, 127, 208, 0.18);
+    border-color: rgba(76, 127, 208, 0.35);
+}
+
+.notification-button:active {
+    background-color: rgba(76, 127, 208, 0.30);
+}
+
+/* the notification applet's own popup body (id set in js/ui/messageTray.js).
+ * Cinnamon has no .message-list / .notification-unread classes — those are GNOME
+ * Shell's, so rules naming them would be dead weight. */
+#notification-body {
+    spacing: 6px;
+}
+
+.notification-applet-padding {
+    padding: 2px 6px;
+}
+
+/* ===== 8. OSD popups (volume, brightness, alt-tab, workspace switch) ===== */
+.info-osd,
+.media-keys-osd,
+.workspace-switch-osd {
+    padding: 12px 16px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 16px;
+    background-color: rgba(246, 247, 249, 0.88);
+    background-blur: 12;
+    box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.20);
+    color: #1f2430;
+    text-align: center;
+}
+
+#altTabPopup {
+    padding: 12px;
+}
+
+.switcher-list {
+    padding: 10px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 18px;
+    background-color: rgba(246, 247, 249, 0.88);
+    background-blur: 14;
+    box-shadow: 0 8px 28px 0 rgba(40, 48, 62, 0.24);
+}
+
+.switcher-list-item-container {
+    spacing: 6px;
+    padding: 6px;
+}
+
+.switcher-list .item-box {
+    padding: 8px 12px;
+    border-radius: 12px;
+}
+
+.switcher-list .item-box:selected {
+    background-color: rgba(76, 127, 208, 0.22);
+}
+
+.switcher-preview-backdrop {
+    background-color: rgba(246, 247, 249, 0.70);
+}
+
+.switcher-arrow {
+    border-color: transparent;
+    color: rgba(31, 36, 48, 0.5);
+}
+
+/* ===== 9. Workspace picker / Expo / Overview ============================ */
+#overview {
+    padding: 12px;
+}
+
+#expo {
+    padding: 12px;
+}
+
+.workspace-graph {
+    padding: 8px;
+}
+
+.workspace,
+.expo-workspace-thumbnail-frame {
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.30);
+}
+
+.workspace:hover {
+    border-color: #4c7fd0;
+}
+
+.expo-workspaces-name-entry {
+    padding: 4px 10px;
+    border-radius: 99px;
+    background-color: rgba(255, 255, 255, 0.55);
+    color: #1f2430;
+    font-size: 10pt;
+}
+
+.lightbox {
+    background-color: rgba(31, 36, 48, 0.25);
+}
+
+/* ===== 10. Dialogs, tooltips, misc ======================================= */
+.run-dialog,
+.popup-dialog,
+.polkit-dialog,
+.end-session-dialog,
+.media-keys-osd {
+    padding: 14px 16px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 18px;
+    background-color: rgba(246, 247, 249, 0.96);
+    box-shadow: 0 10px 32px 0 rgba(40, 48, 62, 0.26);
+    color: #1f2430;
+}
+
+.run-dialog-entry,
+.prompt-dialog-password-entry {
+    padding: 6px 10px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 999px;
+    background-color: #ffffff;
+    color: #1f2430;
+    selection-background-color: #4c7fd0;
+    selected-color: #ffffff;
+}
+
+.dialog-button {
     padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    background-color: rgba(255, 255, 255, 0.75);
+    color: #1f2430;
+}
+
+.dialog-button:hover {
+    background-color: rgba(76, 127, 208, 0.16);
+}
+
+.dialog-button:active {
+    background-color: rgba(76, 127, 208, 0.28);
+}
+
+#Tooltip {
+    padding: 5px 9px;
     border-radius: 8px;
-    margin: 4px 4px;
-    color: #2c3e50;
+    background-color: rgba(31, 36, 48, 0.92);
+    color: #f2f4f7;
+    font-size: 9pt;
+    text-align: center;
 }
 
-.menu-button:active {
-    background-color: rgba(120, 160, 220, 0.25);
+.icon-button {
+    padding: 4px;
+    border-radius: 99px;
 }
 
-/* ===== Peluncur aplikasi ===== */
-.app-launcher {
-    spacing: 4px;
+.icon-button:hover {
+    background-color: rgba(76, 127, 208, 0.16);
 }
 
-/* ===== Sistem tray & jam (kanan taskbar) ===== */
-.panel-right {
+.check-box,
+.radiobutton {
+    font-size: 10pt;
     spacing: 8px;
 }
 
-.clock {
-    padding: 5px 12px;
-    border-radius: 7px;
-    margin: 3px 4px;
-    color: #2c3e50;
+.toggle-switch {
+    width: 40px;
+    height: 20px;
+    background-color: rgba(150, 158, 170, 0.45);
+    border-radius: 99px;
 }
 
-/* ===== Notifikasi ===== */
-.notification {
-    background-color: rgba(240, 240, 240, 0.95);
-    border-radius: 10px;
-    color: #2c3e50;
-    border: 1px solid rgba(200, 200, 200, 0.6);
+.toggle-switch:checked {
+    background-color: #4c7fd0;
+}
+
+/* systray + appindicator area */
+.systray,
+.system-status-icon {
+    icon-size: 18px;
+    color: #1f2430;
+}
+
+.system-status-icon {
+    padding: 3px 5px;
+    border-radius: 8px;
+}
+
+.system-status-icon:hover {
+    background-color: rgba(76, 127, 208, 0.16);
+}
+
+/* show-desktop cornerbar (bottom-right sliver, Windows-style) */
+.applet-cornerbar-box {
+    border-left: 1px solid rgba(150, 158, 170, 0.55);
+    margin: 6px 2px;
+}
+
+.applet-cornerbar {
+    width: 10px;
+    background-color: rgba(150, 158, 170, 0.35);
+    border-radius: 4px;
+}
+
+.applet-cornerbar:hover {
+    background-color: rgba(76, 127, 208, 0.55);
+}
+
+/* hover-click action bar (touchpad/trackpad helper popups) */
+.hover-click-box {
+    padding: 6px;
+    border-radius: 14px;
+    background-color: rgba(246, 247, 249, 0.92);
+    border: 1px solid rgba(190, 196, 205, 0.9);
+}
+
+/* tile/snap preview lines while dragging a window */
+.tile-preview,
+.tile-hud {
+    border: 2px solid rgba(76, 127, 208, 0.85);
+    border-radius: 14px;
+    background-color: rgba(76, 127, 208, 0.18);
+}
+
+/* desktop context menu / icon labels */
+.context-menu {
+    border-radius: 14px;
+}
+
+.window-caption {
+    color: #1f2430;
+    background-color: rgba(246, 247, 249, 0.85);
+    border-radius: 8px;
+    padding: 2px 6px;
+}
+
+/* looking glass (debug) — kept readable on a light shell */
+#LookingGlassDialog {
+    border: 1px solid rgba(190, 196, 205, 0.9);
+    border-radius: 14px;
+    background-color: rgba(246, 247, 249, 0.96);
+    color: #1f2430;
+    padding: 8px;
 }

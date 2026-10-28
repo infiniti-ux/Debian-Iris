@@ -1,0 +1,92 @@
+# =============================================================================
+# Iris — gsettings profile (Cinnamon 6.4 / Debian 13 trixie)
+#
+# Format (one setting per line, TAB separated):
+#   <schema>\t<key>\t<gvariant value>
+#
+# Everything below was checked against the upstream schema files, not guessed:
+#   linuxmint/cinnamon          data/org.cinnamon.gschema.xml
+#   linuxmint/cinnamon-desktop  schemas/org.cinnamon.desktop.*.gschema.xml.in
+#   linuxmint/nemo              libnemo-private/org.nemo.gschema.xml
+#
+# Deliberately ABSENT, because these keys do not exist in Cinnamon and the old
+# profile shipped by this repo invented them (they were silently dropped):
+#   org.cinnamon theme                       -> it is org.cinnamon.theme  name
+#   org.cinnamon panel-positions/panel-heights-> panels-enabled / panels-height
+#   org.cinnamon.desktop.interface color-scheme|document-font-name|monospace-font-name
+#   org.cinnamon.desktop.background show-desktop-icons|show-desktop-icon-names
+#                                               -> those live in org.nemo.desktop
+#   org.cinnamon.desktop.notifications icon-size
+#
+# Apply with:  scripts/apply-settings.sh config/gsettings/iris.gsettings
+# The applier validates schema+key against the *installed* schemas first and
+# skips (with a warning) anything unknown, so a newer Cinnamon can never be
+# poisoned by a stale key.
+# =============================================================================
+
+# --- Shell theme (Cinnamon's St theme: panel, menus, OSD) -------------------
+org.cinnamon.theme	name	'Iris'
+
+# --- GTK / icons / cursor / fonts -------------------------------------------
+org.cinnamon.desktop.interface	gtk-theme	'Iris'
+org.cinnamon.desktop.interface	icon-theme	'Papirus-Light'
+org.cinnamon.desktop.interface	cursor-theme	'Bibata-Modern-Classic'
+org.cinnamon.desktop.interface	cursor-size	24
+org.cinnamon.desktop.interface	font-name	'Cantarell 11'
+org.cinnamon.desktop.interface	enable-animations	true
+org.cinnamon.desktop.interface	gtk-overlay-scrollbars	true
+org.cinnamon.desktop.interface	clock-use-24h	true
+
+# --- Window manager (SSD frames are drawn from the GTK theme, see index.theme)
+org.cinnamon.desktop.wm.preferences	theme	'Iris'
+org.cinnamon.desktop.wm.preferences	button-layout	'close,minimize,maximize:appmenu'
+org.cinnamon.desktop.wm.preferences	titlebar-uses-system-font	false
+org.cinnamon.desktop.wm.preferences	titlebar-font	'Cantarell Bold 11'
+org.cinnamon.desktop.wm.preferences	action-double-click-titlebar	'toggle-maximize'
+org.cinnamon.desktop.wm.preferences	action-middle-click-titlebar	'lower'
+org.cinnamon.desktop.wm.preferences	action-right-click-titlebar	'menu'
+org.cinnamon.desktop.wm.preferences	focus-new-windows	'smart'
+org.cinnamon.desktop.wm.preferences	num-workspaces	4
+
+# --- Background ---------------------------------------------------------------
+org.cinnamon.desktop.background	picture-uri	'file:///usr/share/backgrounds/iris-aluminium.png'
+org.cinnamon.desktop.background	picture-options	'zoom'
+org.cinnamon.desktop.background	primary-color	'#eef0f3'
+org.cinnamon.desktop.background	secondary-color	'#c7ccd4'
+org.cinnamon.desktop.background	color-shading-type	'solid'
+
+# --- Desktop icons (owned by nemo-desktop, NOT by Cinnamon) ------------------
+org.nemo.desktop	show-desktop-icons	true
+org.nemo.desktop	trash-icon-visible	true
+org.nemo.desktop	home-icon-visible	false
+org.nemo.desktop	computer-icon-visible	true
+org.nemo.desktop	network-icon-visible	false
+org.nemo.desktop	volumes-visible	true
+org.nemo.desktop	use-desktop-grid	true
+
+# --- Windows-style bottom panel ----------------------------------------------
+# panels-enabled / panels-height / panels-autohide format: "<id>:<monitor>:<pos>"
+# and "<id>:<value>" respectively (see data/org.cinnamon.gschema.xml defaults).
+org.cinnamon	panels-enabled	['1:0:bottom']
+org.cinnamon	panels-height	['1:44']
+org.cinnamon	panels-autohide	['1:false']
+org.cinnamon	panel-zone-icon-sizes	'[{"panelId": 1, "left": 0, "center": 0, "right": 22}]'
+org.cinnamon	panel-zone-symbolic-icon-sizes	'[{"panelId": 1, "left": 24, "center": 24, "right": 16}]'
+org.cinnamon	panel-scale-text-icons	true
+# applet layout: "panel<id>:<zone>:<index>:<uuid>" — every UUID below is a real
+# applet shipped by Cinnamon 6.4 (files/usr/share/cinnamon/applets/).
+org.cinnamon	enabled-applets	['panel1:left:0:menu@cinnamon.org', 'panel1:left:1:separator@cinnamon.org', 'panel1:left:2:panel-launchers@cinnamon.org', 'panel1:center:0:window-list@cinnamon.org', 'panel1:right:0:systray@cinnamon.org', 'panel1:right:1:xapp-status@cinnamon.org', 'panel1:right:2:notifications@cinnamon.org', 'panel1:right:3:keyboard@cinnamon.org', 'panel1:right:4:network@cinnamon.org', 'panel1:right:5:sound@cinnamon.org', 'panel1:right:6:power@cinnamon.org', 'panel1:right:7:calendar@cinnamon.org', 'panel1:right:8:cornerbar@cinnamon.org']
+
+# --- Alt-tab / snapping behaviour that reads as "modern desktop" -------------
+org.cinnamon	alttab-switcher-style	'icons+thumbnails'
+org.cinnamon	alttab-minimized-aware	true
+org.cinnamon	show-snap-osd	true
+org.cinnamon	desktop-effects-on-dialogs	true
+org.cinnamon	desktop-effects-on-menus	true
+
+# --- Optional ---------------------------------------------------------------
+# org.cinnamon panel-launchers is DEPRECATED upstream (default ["DEPRECATED"]) —
+# do not write it. Pinned items are managed by the panel-launchers applet GUI.
+# The start menu / favorites row reads favorite-apps; only list .desktop files
+# that actually exist on the target system, or the applet shows blank tiles:
+# org.cinnamon	favorite-apps	['firefox-esr.desktop', 'org.gnome.Terminal.desktop', 'nemo.desktop']

@@ -1,0 +1,121 @@
+name: ci
+
+on:
+  push:
+    branches: [main, "arena/**"]
+  pull_request:
+  workflow_dispatch:
+
+# Everything runs against the real target: Debian 13 (trixie).
+jobs:
+  check:
+    name: validate theme + configs
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install tooling
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends make python3 shellcheck
+
+      - name: make check
+        run: make check-strict
+
+      - name: shellcheck
+        run: shellcheck -x scripts/*.sh scripts/lib/*.sh
+
+      - name: profile is tab-shaped and parseable
+        run: |
+          python3 - <<'PY'
+          import sys
+          bad = []
+          for i, raw in enumerate(open("config/gsettings/iris.gsettings", encoding="utf-8"), 1):
+              line = raw.rstrip("\n")
+              if not line.strip() or line.lstrip().startswith("#"):
+                  continue
+              if len(line.split("\t")) < 3:
+                  bad.append(i)
+          if bad:
+              sys.exit(f"lines not in schema<TAB>key<TAB>value form: {bad}")
+          print("profile format ok")
+          PY
+
+  roundtrip:
+    name: install / uninstall round-trip
+    runs-on: ubuntu-latest
+    needs: check
+    container:
+      image: debian:trixie
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install
+        run: |
+          ./scripts/install.sh --with-session --with-lightdm --force --yes
+          test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
+          test -f /usr/share/themes/Iris/gtk-3.0/gtk.css
+          test -f /usr/share/themes/Iris/gtk-4.0/gtk.css
+          test -f /usr/share/themes/Iris/index.theme
+          test ! -e /usr/share/themes/Iris/metacity-1
+          test -f /usr/share/xsessions/iris.desktop
+          test -f /usr/share/cinnamon-session/sessions/iris.session
+          test -f /etc/lightdm/lightdm.conf.d/60-iris.conf
+          test -f /var/lib/iris/manifest
+          # the main lightdm config must be untouched by us
+          ! grep -q "iris" /etc/lightdm/lightdm.conf 2>/dev/null
+
+      - name: dry-run is inert
+        run: |
+          ./scripts/install.sh --with-session --force --yes --dry-run
+          ./scripts/uninstall.sh --yes --dry-run
+          test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
+
+      - name: uninstall restores everything
+        run: |
+          ./scripts/uninstall.sh --yes --restore-settings
+          test ! -e /usr/share/themes/Iris
+          test ! -e /usr/share/xsessions/iris.desktop
+          test ! -e /usr/share/wayland-sessions/iris-wayland.desktop
+          test ! -e /etc/lightdm/lightdm.conf.d/60-iris.conf
+          test ! -e /usr/share/iris
+          # a leftover non-empty tree would be a bug; the dir must be gone, not emptied
+          test ! -e /usr/share/cinnamon-session/sessions
+
+  package:
+    name: build .deb
+    runs-on: ubuntu-latest
+    needs: check
+    container:
+      image: debian:trixie
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install packaging tools
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends \
+            dpkg-dev debhelper devscripts make python3 lintian
+
+      - name: build
+        run: dpkg-buildpackage -us -uc -b
+
+      - name: inspect + lint
+        run: |
+          cd ..
+          dpkg -i iris-theme_*.deb
+          dpkg -L iris-theme | sed -n '1,40p'
+          test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
+          test -x /usr/bin/iris-apply-settings
+          lintian --no-tag-display-limit iris-theme_*.deb || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iris-theme-deb
+          path: ../iris-theme_*.deb
+          if-no-files-found: error
