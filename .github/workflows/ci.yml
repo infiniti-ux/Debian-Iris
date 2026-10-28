@@ -108,7 +108,7 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y -qq --no-install-recommends \
-            dpkg-dev debhelper devscripts make python3 lintian
+            build-essential dpkg-dev debhelper devscripts make python3 lintian
 
       - name: build
         # The raw log lives on a host that headless/sandboxed clients cannot always

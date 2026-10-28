@@ -15,9 +15,12 @@ override_dh_auto_test:
 
 override_dh_auto_install:
 
-# this tree carries far more than the theme package installs (scripts with side
-# effects, docs, the live-build profile, the Makefile). Listing the leftovers is
-# useful; --fail-missing would turn every deliberate omission into a build error.
+# This tree deliberately ships more than the .deb installs (the side-effecting
+# installer/remover, docs, the live-build profile, this Makefile). List the
+# leftovers rather than failing on them; what the package *must* contain is
+# asserted by debian/*.install plus the `dpkg -L` step in CI. --list-missing keeps
+# that visible in the build log without turning a deliberate omission into an
+# error we would be tempted to paper over.
 override_dh_missing:
 	dh_missing --list-missing
 
