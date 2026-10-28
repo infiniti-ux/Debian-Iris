@@ -377,35 +377,9 @@ def main() -> int:
             r = subprocess.run(["bash", "-n", p], capture_output=True, text=True)
             if r.returncode:
                 rep.err(rel, "bash syntax error: " + r.stderr.strip()[:300])
-    shellcheck = shutil_which("shellcheck")
-    if shellcheck:
-        scripts = sorted(
-            os.path.join(dp, f)
-            for dp, _d, fs in os.walk(os.path.join(root, "scripts"))
-            for f in fs
-            if f.endswith(".sh")
-        )
-        if scripts:
-            # -P SCRIPTDIR lets the `# shellcheck source=` directives resolve, so the
-            # shared library is followed and cross-file variables are understood.
-            r = subprocess.run(
-                [shellcheck, "-x", "-P", "SCRIPTDIR", "--format=gcc", *scripts],
-                capture_output=True, text=True, cwd=root,
-            )
-            for ln in r.stdout.splitlines():
-                ln = ln.strip()
-                if not ln:
-                    continue
-                # gcc format: file:line:col: severity: message [SCxxxx]
-                sev = "err" if ": error:" in ln else "warn"
-                where = ln.split(":", 1)[0]
-                where = where[len(root) + 1:] if where.startswith(root + "/") else where
-                msg = ln.split(": ", 2)[-1] if ln.count(": ") >= 2 else ln
-                if sev == "err":
-                    rep.err(where, f"shellcheck: {msg}")
-                else:
-                    rep.warn(where, f"shellcheck: {msg}")
-
+    # shellcheck is deliberately NOT run from here: its findings vary with the
+    # installed version, and a validator that changes verdicts between machines is
+    # worse than no validator. Style lives in `make lint-sh` / CI.
     print(f"checked {root}")
     for m in rep.errors:
         print(f"  ERROR   {m}")

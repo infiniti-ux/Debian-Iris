@@ -22,11 +22,19 @@ jobs:
           apt-get update -qq
           apt-get install -y -qq --no-install-recommends make python3 shellcheck
 
-      - name: make check
-        run: make check-strict
+      # the semantic gates are hard errors: a bad selector, a nonexistent schema
+      # key, a fake package name or a broken session file must never ship.
+      - name: validate everything
+        run: make check && make check-strict
 
-      - name: shellcheck
-        run: shellcheck -x -P SCRIPTDIR --format=gcc scripts/*.sh scripts/lib/*.sh
+      # style findings depend on the shellcheck version, so the blocking half is
+      # limited to real errors and the advisory half is allowed to speak freely.
+      - name: shellcheck (errors block)
+        run: shellcheck -x -P SCRIPTDIR --severity=error scripts/*.sh scripts/lib/*.sh
+
+      - name: shellcheck (warnings advisory)
+        continue-on-error: true
+        run: make lint-sh
 
       - name: profile is tab-shaped and parseable
         run: |

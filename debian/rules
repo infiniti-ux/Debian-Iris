@@ -1,12 +1,23 @@
 #!/usr/bin/make -f
-# Iris ships data + scripts only; nothing to compile.
+# Iris ships data + shell/python tooling; there is nothing to compile. The
+# auto* overrides below exist because the repo root has a Makefile (for humans),
+# and debhelper would otherwise run `make install` and fail on a target that
+# deliberately does not exist.
 %:
 	dh $@
+
+override_dh_auto_configure:
+
+override_dh_auto_build:
 
 override_dh_auto_test:
 	$(MAKE) check
 
+override_dh_auto_install:
+
 execute_after_dh_install:
-	# scripts must stay executable and must not silently gain setuid bits
+	# keep the helpers executable; nothing here should ever gain a setuid bit
 	chmod 0755 debian/iris-theme/usr/share/iris/scripts/*.sh \
-	           debian/iris-theme/usr/share/iris/tools/*.py 2>/dev/null || true
+	           debian/iris-theme/usr/share/iris/tools/*.py
+
+.PHONY: override_dh_auto_configure override_dh_auto_build override_dh_auto_test override_dh_auto_install
