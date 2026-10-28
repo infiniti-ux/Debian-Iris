@@ -1,3 +1,18 @@
-# /usr/bin/iris-apply-settings is a shell helper for a data package; there is no
-# compiled program here to document, and --help in the script covers usage
-iris-theme: binary-without-manpage usr/bin/iris-apply-settings
+# Every entry below is a tag lintian actually reports on this package, with the
+# reason it is wrong here. Keep them file-scoped: a tag-only override hides real
+# findings elsewhere (an earlier revision of this file overrode a tag that does not
+# exist at all, so it did nothing while looking like it did).
+
+# /usr/bin/iris-apply-settings is a 30-line shell wrapper documented by --help;
+# a data package shipping a helper script does not need a manpage.
+iris-theme: no-manual-page usr/bin/iris-apply-settings
+
+# scripts/lib/common.sh is sourced, never executed; keeping it non-executable is
+# what stops anyone from running the library as a program.
+iris-theme: script-not-executable usr/share/iris/scripts/lib/common.sh
+
+# Type=XSession is not in the freedesktop desktop-entry spec, but it is what the
+# xsessions directory has always used and what LightDM/greeters match on; upstream
+# cinnamon-common ships its session entry the same way. Changing it would break the
+# greeter for a tag that is only complaining about a spec it does not cover.
+iris-theme: desktop-entry-unknown-type usr/share/xsessions/iris.desktop

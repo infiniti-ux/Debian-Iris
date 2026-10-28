@@ -1,7 +1,7 @@
 Source: iris-desktop-skin
 Section: x11
 Priority: optional
-Maintainer: infiniti-ux <noreply@localhost>
+Maintainer: infiniti-ux <257943473+infiniti-ux@users.noreply.github.com>
 Build-Depends: debhelper-compat (= 13), make, python3
 Standards-Version: 4.7.0
 Rules-Requires-Root: no
