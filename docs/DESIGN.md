@@ -93,3 +93,38 @@ debian/                                   .deb = cara install yang sebenarnya
 6. `config/gsettings/*` hanya berisi schema/key yang dikenal; key yang terbukti tidak ada di
    upstream ditolak sebagai error.
 7. Nama paket di `config/package-lists/*` harus benar-benar ada di arsip Debian.
+8. Selector yang mengenai banyak aplikasi (`toolbar.primary-toolbar`, `stackswitcher button`,
+   `notebook tab`, dsb.) harus di-scope ke id widget aplikasi target — lihat §7. Kalau tidak,
+   satu "percantik Settings" bisa ngilangin surface header app sebelah.
+
+## 7. Aplikasi Settings (`cinnamon-settings`) — yang bisa dan tidak bisa di-CSS
+
+Semua nama di bawah dibaca dari sumber upstream (`linuxmint/cinnamon`,
+`files/usr/share/cinnamon/cinnamon-settings/`), bukan dari tebakan — ini bagian yang bikin
+§6 relevan:
+
+| Sumber | Isi yang dipakai sebagai hook CSS |
+|---|---|
+| `cinnamon-settings.ui` | `GtkBox#main_box` → `GtkToolbar#top_bar` (style class `primary-toolbar`) → `GtkStack#header_stack` berisi `GtkEntry#search_box` atau `GtkButton#button_back` + `GtkStackSwitcher#stack_switcher`; lalu `GtkStack#main_stack` → `GtkScrolledWindow#side_view_sw` (class `cs-category-view`, `view`, ditambah di `.py` baris 280-281) → `GtkBox#category_box`, dan `#content_box_sw` → `GtkBox#content_box` |
+| `cinnamon-settings.py::prepCategory()` | tiap kategori = `GtkSeparator` + `GtkBox(GtkImage + GtkLabel)` + `GtkIconView`; item IconView digambar dengan `GTK_STYLE_CLASS_CELL` + state `selected`, dan cara resmi ngebulatin tile adalah `iconview:selected { border-radius }` (persis yang dilakukan Adwaita) |
+| `bin/SettingsWidgets.py` | halaman modul diberi nama `c_box` |
+| `libXApp` | node `stacksidebar` (+ `.sidebar`, row `.needs-attention`); `XAppPreferencesWindow` cuma nambah `.frame` / `.view` / `text-button` |
+
+Yang Iris sentuh (`gtk-3.0/gtk.css` §13): header toolbar jadi permukaan aluminium transpar,
+`#search_box` jadi pill "Search apps", `#stack_switcher` jadi segmented pill, `#button_back`
+ghost circle, tile kategori M3 (tonal fill + radius 20 + hairline antar kategori), isi modul
+jadi kartu (`frame` radius 18, hairline `separator`), `switch` rasio M3 (track 44×24 / knob 18),
+row sidebar jadi pill — bagian terakhir ini juga kepakai di app XApp lain (Nemo prefs,
+xlet-manager).
+
+Yang **tidak** bisa: sidebar kiri permanen kayak screenshot. Cinnamon 6.x memang navigasi
+dua-level — `main_stack` muter `side_view_page` ⇄ `content_box_page`, dan ukuran/spacing tile
+di-set dari Python (`set_item_width`, `set_margin(20)`, `column_spacing 18`). CSS nggak bisa
+pindahin widget antar halaman satu stack, jadi yang berubah itu *gaya*, bukan *tata letak*.
+
+Kalau mau sama persis, dua jalur yang jujur:
+1. patch `cinnamon-settings.py` jadi `Gtk.Paned`/flap + `stacksidebar` permanen → artinya fork
+   `cinnamon` (melanggar prinsip "bukan fork", dan harus di-maintain tiap rilis Mint/Debian);
+2. bikin app Level 1 sendiri ("Iris Control"): shell GTK3 kecil dengan sidebar M3 + search,
+   tiap entri manggil `cinnamon-settings <module>` — skin tetap utuh, bisa dihapus tanpa sisa.
+   Jalur ini yang direncanakan; lihat `docs/RESEARCH.md` (level 1) dan README "Status & arah".
