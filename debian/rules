@@ -25,8 +25,7 @@ override_dh_missing:
 	dh_missing --list-missing
 
 execute_after_dh_install:
-	# keep the helpers executable; nothing here should ever gain a setuid bit
-	chmod 0755 debian/iris-theme/usr/share/iris/scripts/*.sh \
-	           debian/iris-theme/usr/share/iris/tools/*.py
+	# keep the helper executable; nothing here should ever gain a setuid bit
+	chmod 0755 debian/iris-theme/usr/share/iris/scripts/*.sh
 
 .PHONY: override_dh_auto_configure override_dh_auto_build override_dh_auto_test override_dh_auto_install override_dh_missing
