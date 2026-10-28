@@ -19,3 +19,4 @@ image-search/
 .direnv/
 __pycache__/
 *.pyc
+dist/

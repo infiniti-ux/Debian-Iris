@@ -121,6 +121,13 @@ jobs:
           rc=$?
           set -e
           cat /tmp/build.log
+          if [ "$rc" -eq 0 ]; then
+            # dpkg-buildpackage drops the result next to the source tree, which is
+            # outside the workspace and therefore unreachable for upload-artifact
+            mkdir -p dist
+            mv ../*.deb ../*.buildinfo ../*.changes dist/ 2>/dev/null || true
+            ls -l dist
+          fi
           if [ "$rc" -ne 0 ]; then
             for ln in $(seq 1 8); do
               line=$(grep -nE 'error|Error|warning: |dh_[a-z]+:' /tmp/build.log | tail -n 8 | sed -n "${ln}p")
@@ -132,17 +139,20 @@ jobs:
 
       - name: inspect + lint
         run: |
-          cd ..
-          # --force-depends: the container does not have a desktop installed, and
-          # pulling in cinnamon just to satisfy Depends: would test nothing here.
-          dpkg -i --force-depends iris-theme_*.deb
+          # --force-depends: the container has no desktop installed, and pulling in
+          # cinnamon just to satisfy Depends: would test nothing here.
+          dpkg -i --force-depends dist/iris-theme_*.deb
           dpkg -L iris-theme | sed -n '1,40p'
           test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
+          test -f /usr/share/themes/Iris/gtk-3.0/gtk.css
+          test -f /usr/share/themes/Iris/index.theme
           test -x /usr/bin/iris-apply-settings
-          lintian --no-tag-display-limit iris-theme_*.deb || true
+          test ! -e /usr/bin/iris-install            # the side-effecting scripts stay out
+          test ! -e /usr/share/themes/Iris/metacity-1
+          lintian --no-tag-display-limit dist/iris-theme_*.deb || true
 
       - uses: actions/upload-artifact@v4
         with:
           name: iris-theme-deb
-          path: ../iris-theme_*.deb
+          path: dist/*.deb
           if-no-files-found: error
