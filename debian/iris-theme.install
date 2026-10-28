@@ -10,3 +10,4 @@ sessions/iris.desktop                 usr/share/xsessions/
 sessions/iris-wayland.desktop         usr/share/wayland-sessions/
 sessions/iris.session                 usr/share/cinnamon-session/sessions/
 sessions/iris-wayland.session         usr/share/cinnamon-session/sessions/
+debian/iris-apply-settings.1            usr/share/man/man1/

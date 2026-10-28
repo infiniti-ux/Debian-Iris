@@ -1,0 +1,81 @@
+.\" Manpage for iris-apply-settings, part of the iris-theme package.
+.TH IRIS-APPLY-SETTINGS 1 "October 2026" "iris-theme" "Iris desktop skin"
+.SH NAME
+iris-apply-settings \- apply a validated Iris GSettings profile to a user
+.SH SYNOPSIS
+.B iris-apply-settings
+.RI [ profile ]
+.RI [ \-\-user\ NAME ]
+.RI [ \-\-dry-run ]
+.RI [ \-\-restore\ FILE ]
+.RI [ \-\-yes ]
+.SH DESCRIPTION
+.IR iris-apply-settings
+reads a profile file of
+.IR schema key value
+lines and writes each value with
+.BR gsettings (1),
+after checking the schema and key against the schemas that are actually
+installed on this machine.
+.PP
+This is deliberately not a
+.BR "dconf load"
+front end. A
+.IR dconf
+dump writes every key it contains, including keys that no application defines
+any more, and it replaces a whole subtree without recording what was there
+before. Here a line naming an unknown schema or key is skipped with a warning,
+the previous value of every key that is changed is saved first, and the result
+is a file that can be replayed or reversed.
+.PP
+It must be run from inside a live graphical session: it needs the user's
+D-Bus session bus and refuses to run (rather than writing to a wrong or empty
+database) when that bus is unavailable.
+.SH OPTIONS
+.TP
+.BI "profile"
+Path to the profile. Defaults to
+.IR /usr/share/iris/config/gsettings/iris.gsettings ,
+which is the profile shipped by this package.
+.TP
+.BI "\-\-user " NAME
+Apply the profile as
+.IR NAME
+instead of the invoking user. When run under
+.BR sudo ,
+the invoking user is taken from
+.IR SUDO_USER .
+.TP
+.BI "\-\-dry-run"
+Report what would be written and what would be skipped. Nothing is written, no
+backup is created.
+.TP
+.BI "\-\-restore " FILE
+Replay a backup file created by an earlier run, restoring the values the key
+had before Iris changed them. The file lives under
+.IR ~/.local/share/iris/settings-backup/ .
+.TP
+.BI "\-\-yes , " \-y
+Do not ask for confirmation before writing.
+.SH EXIT STATUS
+Returns 0 when the profile was applied (or every remaining line was
+deliberately skipped with a warning), and non-zero when the profile is
+unreadable, the session bus is missing, or
+.BR gsettings (1)
+rejected a value.
+.SH FILES
+.TP
+.I /usr/share/iris/config/gsettings/iris.gsettings
+The shipped profile: panel layout and height, applet placement, window and
+notification behaviour. Lines starting with
+.B #
+are comments; every other line is
+.IR "schema<TAB>key<TAB>value" .
+.TP
+.I ~/.local/share/iris/settings-backup/
+Timestamped backups of previous values, one file per run, used by
+.BR \-\-restore .
+.SH "SEE ALSO"
+.BR gsettings (1),
+.BR dconf (1),
+.I /usr/share/doc/iris-theme/README.md
