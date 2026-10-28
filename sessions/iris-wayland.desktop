@@ -1,0 +1,22 @@
+# Iris session entry for the login screen (Wayland)
+#
+# Installed to: /usr/share/wayland-sessions/iris-wayland.desktop
+#
+# Upstream's Wayland entry (data/wayland_sessions/cinnamon-wayland.desktop.in)
+# uses Type=Application (not XSession) and the `--wayland` flag of the
+# cinnamon-session-cinnamon wrapper; we keep the same shape but select the
+# iris-wayland session definition.
+#
+# NOTE: requires the `xwayland` package (see sessions/iris-wayland.session for
+# why) and a display manager that offers /usr/share/wayland-sessions.
+
+[Desktop Entry]
+Name=Iris (Wayland)
+Name[id]=Iris (Wayland)
+Comment=Iris desktop on Wayland (Cinnamon shell, experimental in Cinnamon 6.4)
+Comment[id]=Desktop Iris di Wayland (shell Cinnamon, masih eksperimental di Cinnamon 6.4)
+Exec=cinnamon-session --session iris-wayland
+TryExec=/usr/bin/cinnamon
+Icon=cinnamon-symbolic
+Type=Application
+DesktopNames=X-Cinnamon;

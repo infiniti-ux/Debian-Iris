@@ -1,0 +1,15 @@
+# Both entries use lintian's modern override syntax: `tag [extra] [file]`, where
+# the bracketed part is the file the tag was reported on. Writing the path where
+# the tag's *extra* data goes does not work -- it silently mismatches and lintian
+# then reports `mismatched-override` on top of the original warning, which is how
+# this file looked for a while.
+
+# scripts/lib/common.sh is a library: it is sourced by the installer scripts and
+# must not be runnable on its own, so its mode is 0644 by design.
+iris-theme: script-not-executable [usr/share/iris/scripts/lib/common.sh]
+
+# Type=XSession is not in the freedesktop desktop-entry spec, but it is what the
+# xsessions directory has always used and what LightDM and the greeters match on;
+# cinnamon-common ships its own session entry the same way and overrides this tag
+# identically. "Fixing" it would remove Iris from the login screen.
+iris-theme: desktop-entry-unknown-type XSession [usr/share/xsessions/iris.desktop]

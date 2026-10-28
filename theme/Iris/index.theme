@@ -1,5 +1,29 @@
+# Iris metatheme — Debian Iris Desktop Environment
+#
+# Format reference: [X-GNOME-Metatheme] section as used by upstream Mint-Y
+# (linuxmint/mint-themes: files/usr/share/themes/Mint-Y/index.theme).
+# GTK3/GTK4 resolve a theme by finding <theme-dir>/<gtk-version>/gtk.css,
+# while cinnamon-settings and Muffin read the metatheme keys below.
+#
+# NOTE: there is deliberately NO metacity-1/ directory in this theme.
+# Muffin (the Cinnamon window manager) no longer parses metacity-theme-3.xml
+# at all: src/ui/theme.c builds window-frame styling from a GtkStyleContext
+# using the GTK theme's own CSS (nodes: window.ssd > decoration > headerbar),
+# and derives the corner radius from the "border-radius" of the *titlebar*
+# node. Window borders for Iris are therefore defined in gtk-3.0/gtk.css.
+
 [Desktop Entry]
 Type=X-GNOME-Metatheme
 Name=Iris
-Comment=Debian Iris Desktop Environment theme — Aluminium OS inspired
-Author=infiniti
+Name[id]=Iris
+Comment=Aluminium-inspired light theme for Cinnamon (rounded, translucent surfaces)
+Comment[id]=Tema terang bernuansa aluminium untuk Cinnamon (sudut membulat, permukaan translusen)
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Iris
+MetacityTheme=Iris
+IconTheme=Papirus-Light
+CursorTheme=Bibata-Modern-Classic
+CursorSize=24
+ButtonLayout=close,minimize,maximize:appmenu

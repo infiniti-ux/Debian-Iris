@@ -1,0 +1,22 @@
+# build artifacts
+/debian/.debhelper/
+/debian/iris-theme/
+/debian/files
+/debian/*.substvars
+/debian/*.debhelper.log
+*.deb
+*.buildinfo
+*.changes
+*.changes.*
+live-build/
+chroot/
+binary/
+.chroot/
+
+# scratch / local reference material (do not commit third-party screenshots)
+image-search/
+*.orig.tar.*
+.direnv/
+__pycache__/
+*.pyc
+dist/

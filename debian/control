@@ -1,0 +1,25 @@
+Source: iris-desktop-skin
+Section: x11
+Priority: optional
+Maintainer: infiniti-ux <257943473+infiniti-ux@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), make, python3
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Vcs-Git: https://github.com/infiniti-ux/Debian-Iris.git
+Vcs-Browser: https://github.com/infiniti-ux/Debian-Iris
+
+Package: iris-theme
+Architecture: all
+Depends: ${misc:Depends}, dconf-cli | gsettings-backend
+Recommends: cinnamon-core, papirus-icon-theme, bibata-cursor-theme, xdg-user-dirs
+Suggests: lightdm, xwayland
+Description: Aluminium-inspired Cinnamon desktop skin (theme, wallpaper, profile)
+ Iris is a desktop "skin" for Cinnamon: a GTK 3/4 theme, a Cinnamon shell
+ theme (panel, menus, notifications, OSD), a wallpaper, and a validated
+ gsettings profile that lays the panel out Windows-style at the bottom of the
+ screen.
+ .
+ It ships no forked compositor and no new session components on its own: the
+ session files are installed as an opt-in convenience, and every setting is
+ checked against the installed GSettings schemas before it is written, so an
+ existing desktop is never left in a half-configured state.

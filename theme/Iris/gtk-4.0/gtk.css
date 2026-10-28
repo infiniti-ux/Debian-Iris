@@ -1,0 +1,361 @@
+/* =============================================================================
+ * Iris — GTK 4 theme
+ *
+ * Scope note (important, and frequently misunderstood):
+ * Muffin draws SSD window frames with its OWN GtkStyleContext, and Muffin is
+ * linked against GTK 3. So SSD frame rounding/shadows always come from
+ * gtk-3.0/gtk.css, never from this file. This file styles GTK4 application
+ * content and CSD headerbars only.
+ *
+ * Caveat: apps using libadwaita and AdwStyleManager's built-in palette
+ * (Adwaita dark toggle, some GNOME 45+ apps) override parts of the theme from
+ * inside the app; that is expected and not a bug in Iris.
+ * ===========================================================================*/
+
+@define-color iris_window      #eef0f3;
+@define-color iris_surface     #f7f8fa;
+@define-color iris_base        #ffffff;
+@define-color iris_fg          #1f2430;
+@define-color iris_fg_dim      rgba(31, 36, 48, 0.65);
+@define-color iris_outline     #c6ccd4;
+@define-color iris_outline_soft rgba(150, 158, 170, 0.45);
+@define-color iris_hover       rgba(76, 127, 208, 0.12);
+@define-color iris_active      rgba(76, 127, 208, 0.22);
+@define-color iris_accent      #4c7fd0;
+@define-color iris_accent_fg   #ffffff;
+@define-color iris_destructive #d1534a;
+@define-color iris_shadow      rgba(40, 48, 62, 0.30);
+
+window {
+    background-color: @iris_window;
+    color: @iris_fg;
+}
+
+window.csd decoration {
+    border-radius: 14px;
+    background-color: @iris_window;
+    border: 1px solid @iris_outline;
+    margin: 10px;
+    box-shadow: 0 6px 18px 2px @iris_shadow;
+}
+
+window.csd:fullscreen decoration,
+window.csd.tiled decoration {
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+}
+
+headerbar {
+    min-height: 40px;
+    padding: 0 8px;
+    background-color: @iris_surface;
+    background-image: none;
+    border-bottom: 1px solid @iris_outline_soft;
+    box-shadow: none;
+    color: @iris_fg;
+}
+
+headerbar:backdrop {
+    background-color: rgba(247, 248, 250, 0.92);
+    color: rgba(31, 36, 48, 0.72);
+}
+
+headerbar windowhandle box {
+    spacing: 2px;
+}
+
+headerbar .title {
+    font-weight: bold;
+}
+
+headerbar .subtitle {
+    color: @iris_fg_dim;
+}
+
+headerbar button.titlebutton {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border-radius: 999px;
+}
+
+button {
+    min-height: 24px;
+    min-width: 16px;
+    padding: 5px 12px;
+    border-radius: 10px;
+    border: 1px solid @iris_outline;
+    background-color: @iris_base;
+    background-image: none;
+    color: @iris_fg;
+    box-shadow: none;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+button:hover {
+    background-color: rgba(76, 127, 208, 0.14);
+    border-color: rgba(76, 127, 208, 0.45);
+}
+
+button:active,
+button:checked {
+    background-color: @iris_active;
+    border-color: rgba(76, 127, 208, 0.6);
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+button.flat {
+    border-color: transparent;
+    background-color: transparent;
+}
+
+button.flat:hover {
+    background-color: @iris_hover;
+}
+
+button.suggested-action {
+    background-color: @iris_accent;
+    border-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+button.destructive-action {
+    background-color: @iris_destructive;
+    border-color: @iris_destructive;
+    color: @iris_accent_fg;
+}
+
+button.image-button {
+    min-width: 22px;
+    padding: 4px;
+    border-radius: 999px;
+}
+
+entry,
+textview text {
+    background-color: @iris_base;
+    color: @iris_fg;
+    border: 1px solid @iris_outline;
+    border-radius: 10px;
+    padding: 5px 10px;
+    min-height: 20px;
+    caret-color: @iris_accent;
+}
+
+entry:focus,
+textview text:focus {
+    border-color: @iris_accent;
+    box-shadow: inset 0 0 0 1px rgba(76, 127, 208, 0.35);
+}
+
+selection {
+    background-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+list,
+list row,
+treeview.view {
+    background-color: transparent;
+    color: @iris_fg;
+}
+
+row {
+    padding: 3px 6px;
+    border-radius: 8px;
+}
+
+row:selected,
+list row:selected,
+treeview.view:selected {
+    background-color: @iris_active;
+    color: @iris_fg;
+}
+
+row:hover,
+treeview.view:hover {
+    background-color: @iris_hover;
+}
+
+popover contents,
+menu,
+menu menu {
+    background-color: rgba(247, 248, 250, 0.98);
+    border: 1px solid @iris_outline;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 6px 22px 2px @iris_shadow;
+}
+
+popover contents modelbutton,
+menu menuitem {
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+popover contents modelbutton:hover,
+menu menuitem:hover {
+    background-color: @iris_accent;
+    color: @iris_accent_fg;
+}
+
+separator {
+    background-color: @iris_outline_soft;
+    min-height: 1px;
+}
+
+notebook header tabs tab {
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: @iris_fg_dim;
+}
+
+notebook header tabs tab:hover {
+    background-color: @iris_hover;
+}
+
+notebook header tabs tab:checked {
+    background-color: @iris_base;
+    border-color: @iris_outline;
+    color: @iris_fg;
+}
+
+paned separator {
+    background-color: @iris_outline_soft;
+    min-width: 1px;
+}
+
+.sidebar,
+navigation-sidebar,
+stacksidebar,
+placessidebar {
+    background-color: rgba(238, 240, 243, 0.92);
+    padding: 6px;
+}
+
+.sidebar row:selected,
+navigation-sidebar row:selected,
+placessidebar row:selected {
+    background-color: rgba(76, 127, 208, 0.20);
+}
+
+progressbar trough,
+scale trough,
+levelbar trough {
+    background-color: rgba(150, 158, 170, 0.30);
+    border: none;
+    border-radius: 999px;
+    min-height: 6px;
+}
+
+progressbar progress,
+scale highlight,
+levelbar block.high {
+    background-color: @iris_accent;
+    border-radius: 999px;
+}
+
+scale slider {
+    min-width: 14px;
+    min-height: 14px;
+    margin: -6px;
+    border-radius: 999px;
+    background-color: @iris_base;
+    border: 1px solid @iris_outline;
+    box-shadow: 0 1px 3px 0 @iris_shadow;
+}
+
+switch {
+    background-color: rgba(150, 158, 170, 0.40);
+    border-radius: 999px;
+    min-height: 20px;
+    padding: 2px;
+}
+
+switch slider {
+    background-color: @iris_base;
+    border-radius: 999px;
+    min-height: 16px;
+    min-width: 16px;
+    box-shadow: 0 1px 3px 0 @iris_shadow;
+}
+
+switch:checked {
+    background-color: @iris_accent;
+}
+
+checkbutton check,
+check {
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 5px;
+    border: 1px solid @iris_outline;
+    background-color: @iris_base;
+    color: @iris_accent_fg;
+}
+
+check:checked {
+    background-color: @iris_accent;
+    border-color: @iris_accent;
+}
+
+radiobutton radio,
+radio {
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 999px;
+    border: 1px solid @iris_outline;
+    background-color: @iris_base;
+}
+
+radio:checked {
+    background-color: @iris_accent;
+    border-color: @iris_accent;
+}
+
+scrollbar {
+    background-color: transparent;
+    border: none;
+}
+
+scrollbar slider {
+    background-color: rgba(90, 100, 115, 0.40);
+    border-radius: 999px;
+    min-width: 6px;
+    min-height: 32px;
+    margin: 2px;
+}
+
+scrollbar slider:hover {
+    background-color: rgba(90, 100, 115, 0.60);
+}
+
+tooltip {
+    background-color: rgba(31, 36, 48, 0.94);
+    color: #f2f4f7;
+    border-radius: 8px;
+}
+
+infobar {
+    padding: 8px 12px;
+    border-radius: 12px;
+    background-color: @iris_surface;
+    border: 1px solid @iris_outline_soft;
+}
+
+/* libadwaita helpers: keep AdwViewSwitcher / AdwClamp aligned with Iris radii */
+box.pill,
+button.pill {
+    border-radius: 999px;
+}
+
+window.floating-bar {
+    border-radius: 14px;
+}

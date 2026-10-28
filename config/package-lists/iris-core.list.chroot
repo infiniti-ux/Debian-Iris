@@ -1,27 +1,59 @@
-# Paket inti untuk Debian Iris Desktop Environment
-# Dikonfigurasi untuk live-build (config/package-lists/iris-core.list.chroot)
+# =============================================================================
+# Core package set for the Iris desktop image.
+#
+# Two consumers:
+#   * live-build: config/package-lists/*.list.chroot  (this file, as-is)
+#   * scripts/install.sh --packages  (reads the same list, ignoring comments)
+#
+# Every name below was checked against the Debian 13 (trixie) archive. Removed
+# from the previous revision because they do not exist and broke `lb build`:
+#   plymouth-theme-iris   -> no such package anywhere; a Plymouth theme is not
+#                            a drop-in asset and a bad one can hang boot.
+#   gpaste                -> a clipboard *manager* (needs a shell extension, and
+#                            it is not part of a themed desktop); it also pulls
+#                            in gnome-shell bits.
+#
+# xwayland is REQUIRED for the Wayland session: cinnamon-common ships the
+# session without depending on it, and without it nemo-desktop dies with
+# "Cannot open display" giving a black desktop (Debian bug #1147594).
+# =============================================================================
 
-# Cinnamon core (DE minimal: Muffin WM, Nemo, settings)
+# Cinnamon core (shell + Muffin WM + Nemo + settings)
 cinnamon-core
 cinnamon-l10n
-cinnamon-settings-daemon
 
-# Display manager
+# Display manager + greeter (LightDM keeps the session picker simple and X11+WL friendly)
 lightdm
 lightdm-gtk-greeter
 
-# X server & dasar
+# X server and input
 xorg
 xserver-xorg-video-all
 xserver-xorg-input-all
 
-# Tema & tampilan aluminium
+# Wayland plumbing for the "Iris (Wayland)" session
+xwayland
+
+# Icon + cursor themes referenced by theme/Iris/index.theme
 papirus-icon-theme
 bibata-cursor-theme
-plymouth
-plymouth-theme-iris
 
-# Alat bantu
-nm-applet
+# Settings backend used by scripts/apply-settings.sh
+dconf-cli
+gsettings-desktop-schemas
+xdg-user-dirs
+
+# Network stack + tray applet (the network@cinnamon.org applet expects these)
 network-manager
-gpaste
+# nm-applet ships inside network-manager-gnome — there is no Debian package
+# called `nm-applet` (the old list named one, which failed the image build).
+network-manager-gnome
+
+# Iris itself is NOT in Debian: build it (`make deb`) and drop the .deb into
+# config/packages.chroot/ — live-build installs *.deb from there. The hook
+# config/hooks/05-iris-defaults.chroot bakes the gsettings profile into the
+# image's system dconf db.
+
+# Firmware for a first boot on real laptops (needs archive-areas to include
+# non-free-firmware in `lb config`)
+firmware-misc-nonfree

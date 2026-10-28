@@ -1,0 +1,20 @@
+# Iris session definition (X11)
+#
+# Installed to: /usr/share/cinnamon-session/sessions/iris.session
+#
+# Format and location verified against upstream linuxmint/cinnamon meson.build:
+#   session files are installed to <datadir>/cinnamon-session/sessions/ and use
+#   the group [Cinnamon Session] with keys Name / RequiredComponents /
+#   DesktopName (see cinnamon.session.in in that repo).
+#
+# DesktopName MUST stay "X-Cinnamon":
+# Cinnamon's own autostart components and many .desktop files are written as
+# OnlyShowIn=X-Cinnamon / NotShowIn=X-Cinnamon, and cinnamon-settings-daemon
+# keys off the same value. Inventing "X-Iris" here silently disables pieces of
+# the session (no settings daemon, no app-indicator support) — which is exactly
+# the class of "blank desktop" bug this project used to ship.
+
+[Cinnamon Session]
+Name=Iris
+RequiredComponents=cinnamon;nemo-autostart;cinnamon-killer-daemon;
+DesktopName=X-Cinnamon

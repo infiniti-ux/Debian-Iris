@@ -1,0 +1,52 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Iris desktop skin
+Source: https://github.com/infiniti-ux/Debian-Iris
+
+Files: *
+Copyright: 2026 infiniti-ux
+License: MIT
+ The theme, scripts, tools and documentation in this package are MIT licensed
+ (see LICENSE).
+
+Files: tools/upstream-selectors.txt
+Copyright: 2011-2026 Linux Mint Project (Cinnamon), 2012-2026 Linux Mint (Mint-Y)
+License: GPL-2.0+
+ Mechanically extracted list of CSS class/id *names* used by Cinnamon's shell
+ and by the Mint-Y theme, kept so that tools/check-theme.py can flag selectors
+ that Cinnamon does not implement. No style rules or other creative content is
+ reproduced. Names and short identifiers are not copyrightable expression; the
+ GPL-2.0+ notice is retained for the derivation, and the upstream projects are
+ not affiliated with or endorsing this package.
+
+Files: debian/*
+Copyright: 2026 infiniti-ux
+License: MIT
+
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+License: GPL-2.0+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 2 can be found in "/usr/share/common-licenses/GPL-2".

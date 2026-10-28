@@ -1,7 +1,22 @@
+# Iris session entry for the login screen (X11)
+#
+# Installed to: /usr/share/xsessions/iris.desktop
+#
+# Mirrors upstream linuxmint/cinnamon data/xsessions/cinnamon.desktop.in, which
+# uses the wrapper `cinnamon-session-cinnamon` (it expands to
+# `cinnamon-session --session cinnamon`). Calling `cinnamon-session` bare — as
+# the previous revision of this file did — skips --session and therefore the
+# component list, so the greeter shows an "Iris" entry that boots a partial
+# session. Here we pass --session iris explicitly, which resolves
+# /usr/share/cinnamon-session/sessions/iris.session.
+
 [Desktop Entry]
 Name=Iris
-Comment=Debian Iris Desktop Environment (Cinnamon-based, Aluminium OS inspired)
-Exec=/usr/bin/cinnamon-session
-TryExec=/usr/bin/cinnamon-session
+Name[id]=Iris
+Comment=Iris desktop (Cinnamon shell, Aluminium-inspired theme)
+Comment[id]=Desktop Iris (shell Cinnamon dengan tema bernuansa aluminium)
+Exec=cinnamon-session --session iris
+TryExec=/usr/bin/cinnamon
+Icon=cinnamon-symbolic
 Type=XSession
 DesktopNames=X-Cinnamon;

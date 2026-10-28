@@ -1,0 +1,17 @@
+# Iris — extra selector names verified by hand against upstream sources.
+#
+# check-theme.py merges this file with tools/upstream-selectors.txt. Entries here
+# exist because tools/gen-selectors.py's SCSS nesting expansion does not always
+# reconstruct a leaf name; each line below was confirmed by reading the upstream
+# file, so please record the evidence instead of silently whitelisting.
+#
+# format: <name>  (comment on the same line = evidence)
+
+calendar-work-day        # linuxmint/cinnamon data/theme/cinnamon-sass/widgets/_calendar.scss: `.calendar { &-work-day {} }`
+calendar-nonwork-day     # same file: `&-nonwork-day { color: $fg_color; }`
+calendar-events-main-box # same file: `&-events-main-box { height: 300px; ... }`
+calendar-main-box        # same file: `&-main-box { margin: $base_margin * 2; }`
+calendar-today           # same file: `&-today { box-shadow: inset ... }`
+calendar-not-today       # same file: `&-not-today { &:selected { ... } }`
+calendar-other-month-day # same file: `&-other-month-day`
+calendar-events-date-label # same file: `&-events-date-label { @extend %title_4 }`
