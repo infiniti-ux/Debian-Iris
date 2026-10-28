@@ -142,14 +142,38 @@ jobs:
           # --force-depends: the container has no desktop installed, and pulling in
           # cinnamon just to satisfy Depends: would test nothing here.
           dpkg -i --force-depends dist/iris-theme_*.deb
-          dpkg -L iris-theme | sed -n '1,40p'
-          test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
-          test -f /usr/share/themes/Iris/gtk-3.0/gtk.css
-          test -f /usr/share/themes/Iris/index.theme
+          dpkg -L iris-theme
+          # every path the skin needs to be picked up, asserted against the package
+          # manifest rather than the filesystem, so a broken .install file cannot pass
+          for f in \
+            /usr/share/themes/Iris/index.theme \
+            /usr/share/themes/Iris/cinnamon/cinnamon.css \
+            /usr/share/themes/Iris/gtk-3.0/gtk.css \
+            /usr/share/themes/Iris/gtk-3.0/gtk-translucent.css \
+            /usr/share/themes/Iris/gtk-4.0/gtk.css \
+            /usr/share/xsessions/iris.desktop \
+            /usr/share/wayland-sessions/iris-wayland.desktop \
+            /usr/share/cinnamon-session/sessions/iris.session \
+            /usr/share/iris/config/gsettings/iris.gsettings \
+            /usr/bin/iris-apply-settings
+          do
+            dpkg -L iris-theme | grep -qx "$f" || { echo "MISSING FROM PACKAGE: $f"; exit 1; }
+          done
+          # and what must never be in a data package: the side-effecting scripts and
+          # the dead metacity theme Muffin does not parse
+          if dpkg -L iris-theme | grep -E 'install\.sh|metacity-1'; then
+            echo "package must not ship the above"; exit 1
+          fi
           test -x /usr/bin/iris-apply-settings
-          test ! -e /usr/bin/iris-install            # the side-effecting scripts stay out
-          test ! -e /usr/share/themes/Iris/metacity-1
-          lintian --no-tag-display-limit dist/iris-theme_*.deb || true
+          test -f /usr/share/themes/Iris/cinnamon/cinnamon.css
+          # lintian stays advisory; findings are echoed as annotations so they are
+          # readable without log access instead of being silenced with `|| true`
+          lintian --no-tag-display-limit -F '[tag] [extra][desc] ' dist/iris-theme_*.deb \
+            > /tmp/lintian.txt 2>&1 || true
+          sed -n '1,20p' /tmp/lintian.txt | while IFS= read -r line; do
+            printf '::warning::lintian: %s\n' "$(printf '%s' "$line" | sed 's/%/%25/g')"
+          done
+          echo "lintian reported $(wc -l < /tmp/lintian.txt) line(s)"
 
       - uses: actions/upload-artifact@v4
         with:

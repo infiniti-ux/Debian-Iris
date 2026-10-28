@@ -50,7 +50,22 @@ sudo -u "$USER" iris-apply-settings      # dari dalam sesi desktop
 ```
 
 Paket memasang tema ke `/usr/share/themes/Iris`, wallpaper, file sesi, dan
-`/usr/share/iris/config/gsettings/iris.gsettings`. Tidak ada perubahan display manager.
+`/usr/share/iris/config/gsettings/iris.gsettings`. Konfigurasi display manager tidak
+disentuh — `/etc/lightdm/lightdm.conf` tidak pernah ditulis ulang oleh apa pun di repo ini.
+
+## Gerbang kualitas (CI)
+
+Tiga job di [`.github/workflows/ci.yml`](.github/workflows/ci.yml), semuanya di container
+`debian:trixie` — diverifikasi di Debian 13 betulan, bukan `ubuntu:latest`:
+
+| Job | Apa yang dibuktikan |
+|---|---|
+| validate theme + configs | `make check` + `make check-strict`: tiap selector `cinnamon.css` harus ada di upstream Cinnamon/Mint-Y, tiap key gsettings harus ada di schema & UUID applet harus nyata, tiap nama paket harus ada di trixie, `index.theme`/`.desktop`/`.session` sah, `bash -n` bersih. `shellcheck --severity=error` memblokir; temuan level warning jadi catatan saja, supaya verdict tidak berubah mengikuti versi linter |
+| install / uninstall round-trip | install betulan → file tema + sesi + drop-in LightDM ada → `--dry-run` terbukti tidak menulis apa pun → uninstall → semua hilang, dan `grep -q iris /etc/lightdm/lightdm.conf` harus gagal |
+| build .deb | `dpkg-buildpackage` (menjalankan `make check` sebagai `dh_auto_test`, jadi `.deb` yang isinya rusak tidak bisa dibangun) → `dpkg -i` → 10 path Assert terhadap `dpkg -L` → `lintian` |
+
+Jadi klaim "config-nya berfungsi" di repo ini bukan opini: selector, key, dan nama paket
+dicek ke sumber upstream sebelum merge, dan installer/uninstaller dijalankan end-to-end.
 
 ## Mengatur setting saja
 
