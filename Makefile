@@ -19,6 +19,9 @@ help:
 check:
 	@$(PYTHON) tools/check-theme.py --root .
 
+lint-sh:
+	@shellcheck -x -P SCRIPTDIR --format=gcc scripts/*.sh scripts/lib/*.sh
+
 check-strict:
 	@$(PYTHON) tools/check-theme.py --root . --strict
 

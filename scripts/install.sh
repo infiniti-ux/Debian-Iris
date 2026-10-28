@@ -54,14 +54,13 @@ done
 FORCE="${FORCE:-0}"
 
 TARGET_USER="${SUDO_USER:-$(id -un)}"
-USER_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 
 need_root
 
 step "Preflight"
 # 1. OS check — this repo targets Debian's package set.
 if ! is_debianish; then
-    warn "this system is not Debian/Ubuntu-family ('"$(os_id)"'); the package names here will not resolve."
+    warn "this system is not Debian/Ubuntu-family ('$(os_id)'); the package names here will not resolve."
     [ "$FORCE" = 1 ] || die "aborting (use --force to continue anyway)"
 fi
 if [ "$(os_id)" = "debian" ] && [ "$(os_version_id)" -lt 13 ] 2>/dev/null; then
@@ -166,9 +165,16 @@ if [ "$WITH_SETTINGS" = 1 ]; then
     step "Applying gsettings profile for ${TARGET_USER}"
     if [ "$TARGET_USER" = "root" ]; then
         warn "target user is root — skipping; run scripts/apply-settings.sh from your own session instead."
-    elif ! run bash "${SCRIPT_DIR}/apply-settings.sh" "${REPO_DIR}/config/gsettings/iris.gsettings" --user "$TARGET_USER" $(is_dry && echo --dry-run); then
-        warn "could not apply settings (no live session bus?). Not fatal — start the session once, then run:"
-        warn "  scripts/apply-settings.sh"
+    else
+        apply_args=("${REPO_DIR}/config/gsettings/iris.gsettings" --user "$TARGET_USER")
+        # 'is_dry && arr+=()' would return 1 in the normal (non-dry) case and trip set -e
+        if is_dry; then
+            apply_args+=(--dry-run)
+        fi
+        if ! run bash "${SCRIPT_DIR}/apply-settings.sh" "${apply_args[@]}"; then
+            warn "could not apply settings (no live session bus?). Not fatal — start the session once, then run:"
+            warn "  scripts/apply-settings.sh"
+        fi
     fi
 fi
 

@@ -19,7 +19,6 @@ SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 # shellcheck source=lib/common.sh
 . "${SCRIPT_DIR}/lib/common.sh"
 
-REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 RESTORE_SETTINGS=0
 TARGET_USER="${SUDO_USER:-$(id -un)}"
 
