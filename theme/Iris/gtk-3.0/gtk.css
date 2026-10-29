@@ -246,8 +246,7 @@ button.toggle,
 
 /* ===== 4. Entries, spinbuttons, text ===================================== */
 entry,
-textview text,
-.view {
+textview text {
     background-color: @iris_base;
     color: @iris_fg;
     border: 1px solid @iris_outline;
@@ -255,6 +254,15 @@ textview text,
     padding: 7px 12px;
     min-height: 24px;
     caret-color: @iris_accent;
+}
+
+/* `.view` is any plain tree / icon / list pane (Nemo's file view, the settings
+ * category view). It gets the paper colour only: the field border and field padding
+ * on that node outline every pane in the desktop, which is exactly how a light theme
+ * starts reading as a stack of boxes. The gtk-4.0 twin already separates them. */
+.view {
+    background-color: @iris_base;
+    color: @iris_fg;
 }
 
 entry:focus,
