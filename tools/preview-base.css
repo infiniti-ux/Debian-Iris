@@ -171,7 +171,10 @@ html, body {
 .popup-menu {
   position: absolute;
   /* the rice's menu button sits in the taskbar centre, so the drawer opens
-   * centred above it — not corner-anchored */
+   * centred above it — not corner-anchored. top:auto kills .t-menu's top:44%
+   * (same node, weaker position): without it top wins over bottom and the
+   * drawer floats mid-screen instead of sitting on the taskbar. */
+  top: auto;
   left: 50%;
   transform: translateX(-50%);
   bottom: 12%;

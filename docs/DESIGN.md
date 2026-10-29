@@ -184,7 +184,7 @@ Mock yang meleset separuh lebih buruk daripada tanpa mock: bagian yang nggak ken
 `preview-base.css` (geometri, tanpa warna) dan terbaca sebagai "temanya jelek", padahal preview-nya
 yang bolong. Jadi `tools/preview.py` punya audit:
 
-1. generate CSS mock, render DOM mock (semua tab + varian state: `dim`, `hl`, `dnd`);
+1. generate CSS mock, render DOM mock (semua tab + varian state: `dim`, `hl`, `dnd`, selalu dengan `full: 1` — tab desktop default-nya product shot bersih, jadi auditnya maksa scene sampler penuh biar cakupannya nggak susut);
 2. parse markup-nya sendiri jadi pohon node (tag soup, cukup untuk HTML yang ia generate sendiri);
 3. cocokkan tiap selector hasil translasi terhadap pohon itu — bukan cuma token terakhir, tapi
    rantai ancestor dengan semantik `>` dan descendant, sambil mengabaikan pseudo runtime

@@ -409,12 +409,13 @@ class Gen:
 def panel_html(gen: Gen) -> str:
     """The panel, using the class names the theme actually styles.
 
-    Node names follow cinnamon's own stylesheet (tools/upstream-selectors.txt):
-    #panel > #panelLeft/#panelCenter/#panelRight, .panel-launchers > .launcher >
-    .applet-box, .window-list > .window-list-item-box, .applet-separator,
-    .systray > .system-status-icon, .panel-corner, .spacer-box, .clock-widget >
-    .clock-time-label + .clock-date-label. `hl` and `dnd` are the highlight and
-    drag states the real panel only shows while the pointer is on it - exposed as
+    Layout mirrors the rice: menu button + separator + launchers + window list,
+    all centered; the side zones stay empty. The tray, spacer and clock are NOT
+    here — in the rice they live on the top bar, and in the mock they are covered
+    by the topbar strip below plus the Components tab, so dropping them costs no
+    audit coverage. Node names follow cinnamon's own stylesheet
+    (tools/upstream-selectors.txt). `hl` and `dnd` are the highlight and drag
+    states the real panel only shows while the pointer is on it - exposed as
     knobs so that styling can be reviewed instead of guessed at.
     """
     side = gen.opts.get("panel", "bottom")
@@ -434,10 +435,6 @@ def panel_html(gen: Gen) -> str:
             ("Files", ""), ("Settings", "is-focused"),
             ("Mozilla Firefox", "is-urgent"), ("Text Editor", ""),
         ]))
-    tray = "".join(
-        f'<div class="t-systray"><div class="t-applet-box">'
-        f'<span class="glyph t-system-status-icon t-applet-icon">{g}</span></div></div>'
-        for g in ["⬉", "◍", "⌁", "▮"])
     corner = ('<div class="t-panel-corner"></div>' if not vertical else
               '<div class="t-panel-corner t-panel-corner-left"></div>')
     # The rice runs TWO panels: a fixed dark top bar (clock left, tray right) plus
@@ -465,25 +462,16 @@ def panel_html(gen: Gen) -> str:
 <div class="t-panel t-panel-{side}{hl}" id="t-panel">
   <div class="t-panel-left{dnd}" id="t-panelLeft">
     {corner}
-    <div class="t-applet-box t-panel-menu-button">
-      <span class="glyph t-applet-icon">◉</span><span class="t-applet-label">Iris</span>
-    </div>
-    <div class="t-panel-launchers">{launchers}</div>
-    <div class="t-applet-separator"><span class="t-applet-separator-line"></span></div>
   </div>
   <div class="t-panel-center{dnd}" id="t-panelCenter">
+    <div class="t-applet-box t-panel-menu-button">
+      <span class="glyph t-applet-icon">◉</span>
+    </div>
+    <div class="t-applet-separator"><span class="t-applet-separator-line"></span></div>
+    <div class="t-panel-launchers">{launchers}</div>
     <div class="t-window-list">{tiles}</div>
   </div>
   <div class="t-panel-right{dnd}" id="t-panelRight">
-    {tray}
-    <div class="t-spacer-box"></div>
-    <div class="t-applet-separator"><span class="t-applet-separator-line"></span></div>
-    <div class="t-applet-box t-clock-box">
-      <div class="t-clock-widget">
-        <div class="t-clock-time-label clock-time">12:30</div>
-        <div class="t-clock-date-label clock-date t-dim-label">Oct 29, 2026</div>
-      </div>
-    </div>
     {corner}
   </div>
 </div>{topbar}"""
@@ -1229,7 +1217,7 @@ def controls_html(gen: Gen) -> str:
 
     sel = "".join(
         f'<option value="{v}"{" selected" if v == o.get("panel", "bottom") else ""}>{t}</option>'
-        for v, t in [("bottom", "bottom (floating pill)"), ("top", "top"),
+        for v, t in [("bottom", "bottom (taskbar)"), ("top", "top"),
                      ("left", "left / vertical"), ("right", "right / vertical")])
     tab = o.get("tab", "desk")
     checks = "".join(
@@ -1238,7 +1226,8 @@ def controls_html(gen: Gen) -> str:
         for k, t in [("dim", "unfocused windows"), ("hl", "panel highlight"),
                      ("dnd", "panel drag zones"), ("grid", "alignment grid"),
                      ("labels", "node labels"),
-                     ("calm", "hide overlays over windows")])
+                     ("calm", "hide overlays over windows"),
+                     ("full", "full sampler scene")])
     return f"""
 <aside class="controls">
   <div class="ctl-head"><b>Iris preview</b><small>rendered from the repo files</small>
@@ -1264,6 +1253,15 @@ def controls_html(gen: Gen) -> str:
 def scene_html(gen: Gen) -> str:
     o = gen.opts
     body_cls = " ".join(c for c in ("dim", "grid", "labels") if o.get(c))
+    if not o.get("full"):
+        # the product shot: wallpaper + drawer + both panels, nothing else. The
+        # full sampler scene (windows, calendar, overlays) lives under ?full=1.
+        return f"""
+<div class="desk {body_cls}">
+  <div class="wallpaper"><img src="/assets/wallpaper.png" alt=""></div>
+  {menu_html()}
+  {panel_html(gen)}
+</div>"""
     gear, page_glyph = "\u2699", "\u25a4"
     files = window_html("Aluminium", files_body(), "win-files", bool(o.get("dim")), "",
                         "Internal SSD", "default-decoration")
@@ -1271,7 +1269,8 @@ def scene_html(gen: Gen) -> str:
                            False, gear, "Cinnamon Settings")
     # the transient overlays sit on top of the windows, which is what a real session
     # does but not what you want while judging layout: ?calm=1 keeps just the
-    # corner-anchored menu + calendar.
+    # centered drawer + calendar. (This whole scene is ?full=1; the default desk
+    # is the clean product shot above.)
     popovers = ("" if o.get("calm") else
                 f"{notification_html()}{osd_html()}")
     editor = window_html(
@@ -1329,8 +1328,9 @@ def mock_dom(gen: Gen) -> str:  # noqa: ARG001 - kept for call-site symmetry
     """
     # Fixed set of states, deliberately not the request's knobs: the audit answers
     # "can this rule land somewhere in the mock?", which must not change because
-    # somebody loaded ?calm=1.
-    variants = [{}, {"dim": 1}, {"hl": 1, "dnd": 1}]
+    # somebody loaded ?calm=1 — or because the desk tab defaults to the clean
+    # product shot while the sampler scene lives under ?full=1.
+    variants = [{"full": 1}, {"dim": 1, "full": 1}, {"hl": 1, "dnd": 1, "full": 1}]
     dom = "".join(scene_html(Gen(v)) for v in variants)
     return dom + shell_samples() + widget_samples()
 
