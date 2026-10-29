@@ -545,7 +545,7 @@ def settings_body(gen: Gen) -> str:
             f'<span class="t-label t-dim-label">{desc}</span></div>{ctl}</div>'
             '\n<div class="t-separator"></div>')
     return f"""
-<div class="t-toolbar{backdrop}" id="t-top_bar">
+<div class="t-toolbar t-primary-toolbar{backdrop}" id="t-top_bar">
   <div class="t-stack" id="t-header_stack">
     <div class="t-box" id="t-hbox2">
       <div class="t-search-entry" id="t-search_box">

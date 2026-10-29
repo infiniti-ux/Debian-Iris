@@ -112,6 +112,21 @@ window.ssd headerbar.titlebar.default-decoration {
     min-height: 34px;
 }
 
+/* App toolbars — Nemo's location row and cinnamon-settings' #top_bar (a
+ * GtkToolbar.primary-toolbar). Same soft surface as the headerbar so a window reads
+ * as "header + body" instead of one flat sheet; scoped to the node, never to `*`. */
+toolbar,
+.primary-toolbar {
+    background-color: @iris_surface;
+    border-bottom: 1px solid @iris_outline_soft;
+    padding: 6px 10px;
+}
+
+toolbar:backdrop,
+.primary-toolbar:backdrop {
+    background-color: rgba(247, 248, 250, 0.92);
+}
+
 window.ssd decoration button.titlebutton {
     min-width: 22px;
     min-height: 22px;
