@@ -29,10 +29,11 @@ ini ditulis literal di tiga file, jadi ubahnya pakai script, bukan satu-satu):
 | Radius | Untuk |
 |---|---|
 | `18px` | window / surface luar: `decoration`, `window.ssd decoration`, `window.ssd headerbar.titlebar`, `window.csd decoration` |
-| `20px` | sheet: `menu`/`.popup`/`.context-menu`, `popover`, `.popup-menu-content`, `.menu`, `.notification` |
+| `20px` | sheet GTK: `menu`/`.popup`/`.context-menu`, `popover`, `.notification` |
+| `24px` | drawer + semua dropdown shell: `.popup-menu-content`, `.menu` (satu node dipakai start menu, kalender, tray popup — semuanya ikut; disengaja) |
 | `14px` | `entry`/`textview text`/`.view`, `row`, tile |
 | `12px` | `menuitem`, `tooltip` |
-| `22px` | panel pill (`.panel-*`), `.info-osd`, `.osd` |
+| `22px` | `.info-osd`, `.osd` (kedua panel full-bleed, radius 0) |
 | `999px` | chip/pill: `button`, `spinbutton`, `.sidebar row`, `.applet-box`, `.window-list-item-box`, `switch`, `.clock-widget`, scrollbar/slider |
 
 Ritme spasi 4px: `row` `8px 12px`, `button` `7px 16px` (min-height 30), `menuitem` `8px 14px`,
@@ -44,8 +45,9 @@ Tebal garis: 1px, kecuali indikator aktif taskbar 2px.
 
 | Permukaan | File | Efek | Catatan |
 |---|---|---|---|
-| Panel bawah | `cinnamon/cinnamon.css` `.panel-bottom` | `rgba(236,238,241,.78)` + `background-blur: 14`, radius 22, margin 10 → melayang | blur di sini yang paling mahal; kalau frame rate turun saat jendela lewat, turunkan ke `background-blur: 6` atau hapus |
-| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 20, search pill | `background-blur` itu parse int, jadi `12` bukan `12px` |
+| Panel atas (30px) | `cinnamon/cinnamon.css` `.panel-top` | `rgba(15,17,23,.55)` + `background-blur: 10`, full-bleed, teks `#f2f4f7` via rule turunan `.panel-top …` | jam kiri + tray kanan; teks gelap base di-override semua — kalau ada yang ke-skip, bug-nya teks hilang di bar gelap |
+| Taskbar bawah (60px) | `.panel-bottom` | putih `rgba(255,255,255,.97)`, `background-blur: 0`, hairline atas | menu + separator + grouped-window-list di tengah; state aktif/fokus tonal biru, bukan wash putih (nggak kelihatan di bar putih) |
+| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 24, sheet lavender `rgba(224,227,234,.96)`, search pill putih | `background-blur` itu parse int, jadi `12` bukan `12px` |
 | Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 20 (OSD 22) | permukaan statis → aman |
 | Frame window (SSD) | `gtk-3.0/gtk.css` `window.ssd decoration` + `window.ssd headerbar.titlebar` | radius 18 di **kedua** node, shadow `0 10px 28px 2px`, titlebutton bulat | Muffin membaca radius dari titlebar (lihat `docs/SAFETY.md` §3) |
 | Headerbar CSD | `gtk-3.0/gtk.css` `headerbar` | permukaan datar, border bawah tipis | untuk app GTK yang menggambar titlebar sendiri |
@@ -194,4 +196,4 @@ yang bolong. Jadi `tools/preview.py` punya audit:
 gagal juga kalau jumlah auto-demo lewat `--max-demo 60` — naiknya angka itu artinya rule tema
 berhenti mendarat di widget sungguhan (class di-rename upstream, atau node yang nggak pernah
 dibangun), dan yang rusak pertama kali adalah desktopnya, bukan auditnya. Angka hari ini:
-328 rule dipetakan, 33 cuma lewat auto-demo, 0 unreachable.
+343 rule dipetakan, 32 cuma lewat auto-demo, 0 unreachable.

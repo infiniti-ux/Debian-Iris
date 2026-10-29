@@ -80,11 +80,13 @@ clean:
 # editing cinnamon.css, restart the shell with Alt+F2 -> r on X11 (on Wayland: log
 # out and in).
 rice:
-	@mkdir -p "$$HOME/.themes"
+	@mkdir -p "$$HOME/.themes" "$$HOME/.local/share/backgrounds"
+	@cp -f "$$PWD/wallpapers/iris-aluminium-dark.png" "$$HOME/.local/share/backgrounds/"
+	@echo "wallpaper -> $$HOME/.local/share/backgrounds/ (for @IRIS_WALLPAPER@)"
 	@ln -sfn "$$PWD/theme/Iris" "$$HOME/.themes/Iris"
 	@echo "theme   -> $$HOME/.themes/Iris (symlink into this checkout)"
 	@bash scripts/apply-settings.sh config/gsettings/iris.gsettings --yes \
-	  || { echo "settings failed, removing the symlink again"; rm -f "$$HOME/.themes/Iris"; exit 1; }
+	  || { echo "settings failed, cleaning up"; rm -f "$$HOME/.themes/Iris" "$$HOME/.local/share/backgrounds/iris-aluminium-dark.png"; exit 1; }
 	@echo "revert  -> make unrice"
 
 unrice:
@@ -94,4 +96,4 @@ unrice:
 	  else \
 	    echo "no backup from 'make rice' found — nothing to restore"; \
 	  fi
-	@rm -f "$$HOME/.themes/Iris"
+	@rm -f "$$HOME/.themes/Iris" "$$HOME/.local/share/backgrounds/iris-aluminium-dark.png"

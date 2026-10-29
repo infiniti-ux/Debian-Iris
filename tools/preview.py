@@ -39,7 +39,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CINNAMON_CSS = "theme/Iris/cinnamon/cinnamon.css"
 GTK3_CSS = "theme/Iris/gtk-3.0/gtk.css"
 PROFILE = "config/gsettings/iris.gsettings"
-WALLPAPER = "wallpapers/iris-aluminium.png"
+WALLPAPER = "wallpapers/iris-aluminium-dark.png"
 
 # Things the mock does differently from the real shell, on purpose. Listed in the
 # mapping tab so nobody mistakes a mock convenience for a theme bug.
@@ -440,6 +440,27 @@ def panel_html(gen: Gen) -> str:
         for g in ["⬉", "◍", "⌁", "▮"])
     corner = ('<div class="t-panel-corner"></div>' if not vertical else
               '<div class="t-panel-corner t-panel-corner-left"></div>')
+    # The rice runs TWO panels: a fixed dark top bar (clock left, tray right) plus
+    # the main taskbar. The desk shows both, so the .panel-top rules land on a real
+    # node instead of an auto-demo — except under ?panel=top, where the main panel
+    # already is the top bar.
+    topbar = "" if side == "top" else """
+<div class="t-panel t-panel-top rice-topbar" id="t-topbar">
+  <div class="t-panel-left" id="t-topbarLeft">
+    <div class="t-applet-box t-clock-box">
+      <div class="t-clock-widget">
+        <div class="t-clock-time-label clock-time">7:14</div>
+        <div class="t-clock-date-label clock-date">Mon, May 11</div>
+      </div>
+    </div>
+  </div>
+  <div class="t-panel-center"></div>
+  <div class="t-panel-right" id="t-topbarRight">
+    <div class="t-systray"><div class="t-applet-box"><span class="glyph t-system-status-icon t-applet-icon">◍</span></div></div>
+    <div class="t-applet-box"><span class="glyph t-applet-icon">⌁</span><span class="t-applet-label">63%</span></div>
+    <div class="t-applet-separator"><span class="t-applet-separator-line"></span></div>
+  </div>
+</div>"""
     return f"""
 <div class="t-panel t-panel-{side}{hl}" id="t-panel">
   <div class="t-panel-left{dnd}" id="t-panelLeft">
@@ -465,7 +486,7 @@ def panel_html(gen: Gen) -> str:
     </div>
     {corner}
   </div>
-</div>"""
+</div>{topbar}"""
 
 
 def window_html(title, body, cls="", backdrop=False, icon="\u25a4", subtitle="",
@@ -918,8 +939,9 @@ def widget_samples() -> str:
         <div class="t-nemo-window-pane"><div class="t-widget t-entry">
           <span class="t-label">type to search</span></div></div>
       </div>
-      <div class="t-nemo-desktop t-nemo-desktop-icon-view"><div class="t-clutter-icon-container">
-        <div class="t-icon"><span class="glyph">▤</span><span class="t-label">Trash</span></div></div></div>"""
+      <div class="desktop-well"><div class="t-nemo-desktop t-nemo-desktop-icon-view"><div class="t-clutter-icon-container">
+        <div class="t-icon"><span class="glyph">▤</span><span class="t-label t-nemo-desktop t-nemo-canvas-item">Trash</span></div>
+        <div class="t-icon"><span class="glyph">▦</span><span class="t-label t-nemo-desktop t-nemo-canvas-item is-selected">Home</span></div></div></div></div>"""
     groups = [
         ("buttons", buttons), ("entries & numbers", entries), ("switches, checks, bars", picks),
         ("tabs / notebook", tabs), ("sidebars & lists", lists), ("popovers, menus, hints", popups),
@@ -1467,7 +1489,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 self._send(200, "image/png", open(os.path.join(ROOT, WALLPAPER), "rb").read())
             except OSError:
-                self._send(404, "text/plain", b"wallpapers/iris-aluminium.png not found")
+                self._send(404, "text/plain", b"wallpapers/iris-aluminium-dark.png not found")
         elif path == "/api/report":
             gen, _html = build(opts)
             payload = {"rules": gen.report, "unreachable": gen.dead,

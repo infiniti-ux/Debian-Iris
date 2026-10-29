@@ -297,6 +297,11 @@ def check_gsettings_profile(root: str, rep: Report) -> None:
                            "(inert config — verify in the .gschema.xml, then `make gsettings`)")
         if not value:
             rep.err(where, "empty value")
+        # @IRIS_WALLPAPER@ is expanded by apply-settings.sh; the file it points
+        # at must exist in the repo or every apply path writes a dangling uri.
+        if "@IRIS_WALLPAPER@" in value and not os.path.isfile(
+                os.path.join(root, "wallpapers/iris-aluminium-dark.png")):
+            rep.err(where, "wallpapers/iris-aluminium-dark.png missing")
         if (schema, key) in seen:
             rep.err(where, f"duplicate entry for {schema} {key}")
         seen.add((schema, key))

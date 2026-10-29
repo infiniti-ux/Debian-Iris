@@ -627,11 +627,21 @@ statusbar {
     -GtkTreeView-vertical-separator: 2;
 }
 
-/* desktop icons are drawn by nemo-desktop: keep the label legible on a light
- * aluminium wallpaper */
+/* desktop icons are drawn by nemo-desktop straight onto the wallpaper, which is
+ * dark now — so the labels need their own paint or they inherit window fg (dark)
+ * and vanish. Mint-Y does exactly this (white + shadow on the canvas item). */
 .nemo-desktop.nemo-desktop-icon-view,
 .nemo-desktop iconview {
     background-color: transparent;
+}
+
+.nemo-desktop.nemo-canvas-item {
+    color: #f2f4f7;
+    text-shadow: 1px 1px rgba(10, 12, 16, 0.6);
+}
+
+.nemo-desktop.nemo-canvas-item:selected {
+    color: #ffffff;
 }
 
 /* ===== 13. cinnamon-settings (the Settings app) ==========================

@@ -105,7 +105,7 @@ Yang bikin ini bukan sekadar mockup cantik:
 - **tiap rule tema harus mendarat di elemen mock.** Preview punya audit internal: DOM mock
   disusun, tiap selector dicocokin ke pohon node (termasuk rantai ancestor), dan yang nggak
   mendarat dipaksa kelihatan sebagai "auto-demo" di tab components — bukan didiemin.
-  `make preview-check` jadi gerbang di CI (hari ini: 328 rule dipetakan, 0 unreachable);
+  `make preview-check` jadi gerbang di CI (hari ini: 343 rule dipetakan, 0 unreachable);
 - tab **components** nge-render kontrol asli satu-satu (button + variant, entry/focus, switch M3,
   checkbox, notebook tab, treeview/sidebar, scale/levelbar/progressbar/scrollbar, infobar, tooltip,
   popover, dialog, systray, window-list & grouped-window-list, appmenu, expo/overview, nemo)
@@ -158,7 +158,7 @@ config/             gsettings profile · live-build package list · hooks
 sessions/           iris.{desktop,session} + varian Wayland
 scripts/            install.sh · uninstall.sh · apply-settings.sh · lib/common.sh
 tools/              check-theme.py (validator) · gen-selectors.py · preview.py (web mock) · daftar selector upstream
-wallpapers/         iris-aluminium.png
+wallpapers/         iris-aluminium-dark.png
 docs/               DESIGN.md · RESEARCH.md · SAFETY.md
 debian/             .deb (iris-theme)
 ```

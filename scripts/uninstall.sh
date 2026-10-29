@@ -101,7 +101,7 @@ else
              /usr/share/wayland-sessions/iris-wayland.desktop \
              /usr/share/cinnamon-session/sessions/iris.session \
              /usr/share/cinnamon-session/sessions/iris-wayland.session \
-             /usr/share/backgrounds/iris-aluminium.png \
+             /usr/share/backgrounds/iris-aluminium-dark.png \
              /usr/share/iris/iris.gsettings \
              /etc/lightdm/lightdm.conf.d/60-iris.conf; do
         [ -e "$p" ] || continue

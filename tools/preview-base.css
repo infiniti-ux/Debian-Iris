@@ -153,6 +153,11 @@ html, body {
 .menu-footer { display: flex; gap: 6px; justify-content: flex-end; }
 .t-app-well { display: flex; align-items: center; gap: 8px; }
 .t-app-well .glyph { font-size: 1.4em; }
+/* Desktop icon labels are painted white by the GTK theme because they sit on the
+ * dark wallpaper; the well stands in for that wallpaper in the Components tab so
+ * the rule can be judged. The colour is the profile's
+ * org.cinnamon.desktop.background primary-color fallback, not a theme value. */
+.desktop-well { background: #14161c; border-radius: 14px; padding: 14px; }
 
 .t-popup-menu, .calendar-menu { display: flex; flex-direction: column; }
 .t-menu, #t-nemo-menu {
@@ -165,7 +170,10 @@ html, body {
 .cal-anchor { position: absolute; right: 4%; bottom: 12%; width: 300px; z-index: 6; }
 .popup-menu {
   position: absolute;
-  left: 5%;
+  /* the rice's menu button sits in the taskbar centre, so the drawer opens
+   * centred above it — not corner-anchored */
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 12%;
   width: 480px;
   z-index: 7;
@@ -206,6 +214,9 @@ html, body {
 }
 .t-panel-bottom { left: 0; right: 0; bottom: 0; }
 .t-panel-top { left: 0; right: 0; top: 0; }
+/* the rice's fixed top bar is 30px while the taskbar is 60px (gsettings
+ * panels-height); the mock honours both so the proportions judge honestly */
+.rice-topbar { height: 30px; }
 .t-panel-left, .t-panel-right {
   top: 0;
   bottom: 0;
