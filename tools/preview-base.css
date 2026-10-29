@@ -55,7 +55,9 @@ html, body {
 .t-window.win-editor   { left: 12%; top: 58%; width: 34%; height: 26%; }
 .t-headerbar { display: flex; align-items: center; gap: 8px; }
 .win-icon { opacity: .8; }
-.t-titlebar .title { flex: 0 1 auto; }
+.t-titlebar .t-title { flex: 0 1 auto; }
+.t-titlebar .t-subtitle { flex: 0 1 auto; }
+.t-window-controls { display: flex; align-items: center; gap: 2px; margin-left: auto; }
 .t-titlebar .spacer { flex: 1 1 auto; }
 .titlebutton { display: inline-grid; place-items: center; }
 .content {
@@ -69,21 +71,30 @@ html, body {
 /* ---- Settings app mock (mirrors cinnamon-settings' widget tree) --------- */
 #t-top_bar { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
 #t-top_bar #t-button_back { display: grid; place-items: center; flex: 0 0 auto; }
-#t-top_bar #t-search_box { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; }
+#t-top_bar #t-search_box { flex: 1 1 auto; min-width: 0; }
+#t-top_bar #t-search_box .t-entry { display: flex; align-items: center; gap: 8px; }
 #t-top_bar #t-search_box .spacer { flex: 1 1 auto; }
+#t-header_stack > .t-box { align-items: center; gap: 8px; }
+#t-box2 { flex: 0 0 auto; }
+#t-content_box .t-border { display: block; }
 #t-stack_switcher { display: flex; align-items: center; }
 #t-stack_switcher .t-button { white-space: nowrap; }
 
 /* The real app swaps #t-main_stack between the category page and the module
  * page; the mock shows both so you can see both styles at once (see the
  * "Mock deviations" list in the mapping tab). */
-.t-stack {
+.t-stack { min-height: 0; }
+/* the header row of Cinnamon Settings: search field left, back + switcher right */
+#t-header_stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 1 1 auto;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
+  min-width: 0;
 }
+#t-hbox2 { flex: 1 1 auto; min-width: 0; }
 .t-scrolledwindow { min-height: 0; overflow: auto; }
+.t-viewport { min-width: 0; }
 .t-box { display: flex; }
 .t-vertical { flex-direction: column; }
 .t-horizontal { flex-direction: row; align-items: center; }
@@ -102,9 +113,10 @@ html, body {
   text-align: center;
 }
 .t-iconview-item .glyph { font-size: 1.8em; line-height: 1; }
-.t-frame > .t-box { display: flex; flex-direction: column; }
+.t-frame > .t-border > .t-box { display: flex; flex-direction: column; }
 .t-row { display: flex; align-items: center; gap: 12px; }
-.row-text { display: flex; flex-direction: column; min-width: 0; }
+.t-row-text, .row-text { display: flex; flex-direction: column; min-width: 0; }
+.t-row-text { flex: 1 1 auto; }
 .t-list-row .t-label:first-of-type { flex: 0 1 auto; }
 .t-list { display: flex; flex-direction: column; flex: 1 1 auto; }
 .t-select { display: flex; align-items: center; gap: 10px; }
@@ -211,7 +223,7 @@ html, body {
 #t-panelRight { flex: 0 0 auto; gap: 2px; justify-content: flex-end; }
 .t-applet-box { display: flex; align-items: center; gap: 6px; }
 .t-panel-menu-button { gap: 7px; }
-.window-list-label {
+.window-list-label, .t-window-list-item-label {
   max-width: 12ch;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -295,3 +307,106 @@ ol.src li .no { color: #4a5568; min-width: 3.5ch; text-align: right; user-select
 ol.src li.hit { background: rgba(76, 127, 208, .22); }
 ol.src code { color: #c8d3e2; }
 .deviations li { color: #e8c07a; }
+
+/* ---- panel nodes, named as cinnamon names them -------------------------- */
+.t-panel-launchers, .t-launcher { display: flex; align-items: center; }
+.t-window-list { display: flex; align-items: center; gap: 4px; }
+.t-window-list-item-box, .t-grouped-window-list-item-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.t-window-list-item-label { min-width: 0; }
+.t-systray { display: flex; align-items: center; }
+.t-spacer-box { flex: 1 1 auto; min-width: 8px; }
+.t-panel-corner { position: absolute; width: 22px; height: 100%; top: 0; }
+.t-panel-left .t-panel-corner, .t-panel-right .t-panel-corner {
+  width: 100%;
+  height: 22px;
+  top: auto;
+}
+.t-clock-widget { display: flex; flex-direction: column; align-items: flex-end; }
+#t-panelLeft, #t-panelCenter, #t-panelRight { position: relative; }
+
+/* ---- Components tab ------------------------------------------------------ */
+/* The gallery reuses the desktop's nodes, so it has to undo the parts of the
+ * scaffolding that are about being a desktop: absolute windows, fixed panel. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.card {
+  border: 1px solid #232935;
+  border-radius: 10px;
+  padding: 10px 12px 12px;
+  background: #14181f;
+  min-width: 0;
+}
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #93a0b4;
+}
+.card-title { margin: 0 0 8px; font-size: 11px; color: #93a0b4; }
+.card .row,
+.card .boxlist { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.card .boxlist { flex-direction: column; align-items: stretch; }
+.card .thumb { display: grid; place-items: center; width: 30px; height: 22px; }
+.card .note { font-size: 11px; color: #93a0b4; }
+.card .t-window,
+.card .t-notification,
+.card .t-menu,
+.card .popup-menu,
+.card .t-info-osd,
+.card .t-altTabPopup,
+.card .t-panel {
+  position: static;
+  inset: auto;
+  width: auto;
+  height: auto;
+  transform: none;
+  z-index: auto;
+}
+.card .t-window { display: inline-flex; flex-direction: column; min-width: 220px; }
+.card .t-decoration { height: auto; }
+.card .t-panel { align-items: stretch; padding: 0 6px; }
+.hint { font-size: 11px; color: #93a0b4; margin: 6px 0 0; max-width: 60ch; }
+.panelrow { display: flex; align-items: center; gap: 6px; height: 40px; }
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 1px dashed #232935;
+  border-radius: 8px;
+  min-width: 0;
+}
+.demo > code { color: #7f8ca1; font-size: 10.5px; word-break: break-all; }
+.demo > div { display: flex; flex-direction: column; gap: 4px; padding: 4px 6px; }
+.t-check, .t-radio { width: 16px; height: 16px; flex: 0 0 auto; }
+.t-checkbutton, .t-radiobutton { display: flex; align-items: center; gap: 8px; }
+.t-scale, .t-levelbar, .t-progressbar { min-width: 140px; }
+.t-scale .t-trough, .t-levelbar .t-trough { display: flex; align-items: center; min-height: 18px; }
+.t-levelbar .t-block { flex: 1 1 auto; height: 10px; }
+.t-scrollbar { width: 10px; min-height: 60px; }
+.t-scrollbar .t-overlay-indicator { height: 100%; }
+.t-notebook > .t-header { display: flex; }
+.t-notebook .t-tabs { display: flex; gap: 2px; }
+.t-infobar, .t-statusbar, .t-tooltip, .t-popover { display: inline-flex; align-items: center; }
+.t-dialog { display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
+.t-dialog-content { display: flex; flex-direction: column; gap: 8px; }
+.t-dialog-button-box { display: flex; gap: 8px; justify-content: flex-end; }
+.t-textview { min-height: 44px; }
+.t-iconview-item { position: relative; }
+.t-settings-body {
+  display: grid;
+  grid-template-columns: 250px auto minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.card .t-settings-body { grid-template-columns: minmax(0, 1fr); }

@@ -91,11 +91,21 @@ make preview                 # http://localhost:8080   (PORT=9000 make preview b
 ```
 
 Yang bikin ini bukan sekadar mockup cantik:
+- **tiap rule tema harus mendarat di elemen mock.** Preview punya audit internal: DOM mock
+  disusun, tiap selector dicocokin ke pohon node (termasuk rantai ancestor), dan yang nggak
+  mendarat dipaksa kelihatan sebagai "auto-demo" di tab components — bukan didiemin.
+  `make preview-check` jadi gerbang di CI (hari ini: 328 rule dipetakan, 0 unreachable);
+- tab **components** nge-render kontrol asli satu-satu (button + variant, entry/focus, switch M3,
+  checkbox, notebook tab, treeview/sidebar, scale/levelbar/progressbar/scrollbar, infobar, tooltip,
+  popover, dialog, systray, window-list & grouped-window-list, appmenu, expo/overview, nemo)
+  pakai nama class yang memang dipakai widget aslinya;
 - tab **mapping** daftar tiap rule tema → elemen mock, dan yang *nggak* bisa diterjemahkan
   dilaporkan, bukan dibuang diem-diem;
 - tab **source** nge-highlight baris CSS yang beneran nyetir render;
-- panel kontrol: blur, alpha surface, skala radius, posisi panel, state backdrop, node labels;
-- klik tile/tab/switch buat ngeliat state `:selected` / `:checked`;
+- panel kontrol: blur, alpha surface, skala radius, posisi panel, state backdrop, panel
+  highlight/dnd, node labels;
+- `:hover` jalan beneran di browser, `:focus`/`:active` disalin dari event ke class yang
+  dicek tema, dan klik tile/tab/switch ngubah `:selected` / `:checked`;
 - `--iris-panel-height` dibaca dari `config/gsettings/iris.gsettings`, bukan dikarang.
 
 Jujur: ini **bukan** renderer GTK/St. Font hinting, biaya blur asli Clutter, dan clip frame

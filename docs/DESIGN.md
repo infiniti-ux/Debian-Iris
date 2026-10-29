@@ -137,11 +137,18 @@ Kalau mau sama persis, dua jalur yang jujur:
 - Parser: stripping komentar (dengan offset newline dipertahankan → nomor baris tetap benar),
   lalu tiap blok `selector { decls }`. `@define-color` di-parse terpisah dan `@iris_*`
   di-expand rekursif supaya warna yang dipakai mock memang warna tema.
-- Selector: pseudo yang dimengerti browser dipertahankan (`:hover`, `:focus`, `:active`);
-  state yang nggak bisa dipegang `<div>` (`:selected`, `:checked`, `:backdrop`, `:highlight`,
-  `:dnd`, `:overview`) dipetakan ke class `.is-*` — kalau tidak, styling state-nya hilang
-  diem-diem dan preview kelihatan "benar". Selector yang nyebut class widget St/Gtk
-  (`StScrollBar StButton#vhandle`) ditandai "no mock node", bukan dipilih sepihak.
+- Parser top-level: statement di antara blok (`@define-color iris_accent #…;`) ikut ke-head
+  blok berikutnya kalau head-nya nggak dipotong sampai `;` terakhir — tanpa itu, rule pertama
+  sesudah blok token (di `gtk.css` itu `window { background; color; font-family }`) kebuang
+  dan seluruh jendela kehilangan background + font. Jumlah `{` di file vs jumlah rule hasil
+  parse selalu dicocokin waktu mengubah parser.
+- Selector: `:hover` dibiarkan jadi pseudo asli (browser menangani hover di mock tanpa bantuan);
+  `:focus`/`:active` dan state yang nggak bisa dipegang `<div>` (`:selected`, `:checked`,
+  `:backdrop`, `:highlight`, `:dnd`, `:overview`) dipetakan ke class `.is-*` — kalau tidak,
+  styling state-nya hilang diem-diem dan preview kelihatan "benar". JS preview nyalin
+  `focusin`/`pointerdown` asli ke class `is-focused`/`is-active`, jadi mock tetap interaktif,
+  dan klik tile/tab/switch mengubah `is-selected`/`is-checked`. Selector yang nyebut class widget
+  St/Gtk (`StScrollBar StButton#vhandle`) ditandai "no mock node", bukan dipilih sepihak.
 - Properti: yang punya padanan web disalin apa adanya; `background-blur`, `spacing`,
   `border-radius-topleft`, `-st-vfade-offset` didekati (daftar + alasannya di tab mapping);
   sisanya (`-gtk-icon-*`, `-GtkTreeView-*`) dilaporkan sebagai tak diterjemahkan.
@@ -152,3 +159,23 @@ Kalau mau sama persis, dua jalur yang jujur:
 - `preview-base.css` isinya geometri mock saja (flex/grid/posisi + chrome situs). Warna,
   radius, border, shadow sengaja tidak ada di situ, supaya "elemen X tampil polos" berarti
   temanya memang tidak punya rule buat X.
+
+### 8.1 Audit reachability — kenapa GUI-nya nggak boleh "kira-kira"
+
+Mock yang meleset separuh lebih buruk daripada tanpa mock: bagian yang nggak kena rule jatuh ke
+`preview-base.css` (geometri, tanpa warna) dan terbaca sebagai "temanya jelek", padahal preview-nya
+yang bolong. Jadi `tools/preview.py` punya audit:
+
+1. generate CSS mock, render DOM mock (semua tab + varian state: `dim`, `hl`, `dnd`);
+2. parse markup-nya sendiri jadi pohon node (tag soup, cukup untuk HTML yang ia generate sendiri);
+3. cocokkan tiap selector hasil translasi terhadap pohon itu — bukan cuma token terakhir, tapi
+   rantai ancestor dengan semantik `>` dan descendant, sambil mengabaikan pseudo runtime
+   (`:hover`, `:focus`) dan class `is-hover/is-focused/is-active` yang disediakan browser/JS;
+4. rule yang tetap nggak mendarat dikasih **auto-demo**: kotak kecil yang membawa class persis
+   seperti selector-nya, muncul di tab **components**, lalu audit diulang.
+
+`make preview-check` (`--print audit`) gagal kalau masih ada selector yang nggak mendarat, dan
+gagal juga kalau jumlah auto-demo lewat `--max-demo 60` — naiknya angka itu artinya rule tema
+berhenti mendarat di widget sungguhan (class di-rename upstream, atau node yang nggak pernah
+dibangun), dan yang rusak pertama kali adalah desktopnya, bukan auditnya. Angka hari ini:
+328 rule dipetakan, 33 cuma lewat auto-demo, 0 unreachable.
