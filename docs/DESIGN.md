@@ -78,6 +78,7 @@ config/package-lists/iris-core.list.chroot daftar paket (live-build + --packages
 scripts/install.sh · uninstall.sh · apply-settings.sh · lib/common.sh
 sessions/*.desktop · sessions/*.session   opsi "Iris" di layar login
 tools/check-theme.py · gen-selectors.py   gerbang kualitas (make check)
+tools/preview.py · preview-base.css       web mock: render dari CSS tema (make preview)
 debian/                                   .deb = cara install yang sebenarnya
 ```
 
@@ -128,3 +129,26 @@ Kalau mau sama persis, dua jalur yang jujur:
 2. bikin app Level 1 sendiri ("Iris Control"): shell GTK3 kecil dengan sidebar M3 + search,
    tiap entri manggil `cinnamon-settings <module>` — skin tetap utuh, bisa dihapus tanpa sisa.
    Jalur ini yang direncanakan; lihat `docs/RESEARCH.md` (level 1) dan README "Status & arah".
+
+## 8. `make preview` — cara theme dibaca ulang jadi web mock
+
+`tools/preview.py` adalah penerjemah, bukan theme kedua:
+
+- Parser: stripping komentar (dengan offset newline dipertahankan → nomor baris tetap benar),
+  lalu tiap blok `selector { decls }`. `@define-color` di-parse terpisah dan `@iris_*`
+  di-expand rekursif supaya warna yang dipakai mock memang warna tema.
+- Selector: pseudo yang dimengerti browser dipertahankan (`:hover`, `:focus`, `:active`);
+  state yang nggak bisa dipegang `<div>` (`:selected`, `:checked`, `:backdrop`, `:highlight`,
+  `:dnd`, `:overview`) dipetakan ke class `.is-*` — kalau tidak, styling state-nya hilang
+  diem-diem dan preview kelihatan "benar". Selector yang nyebut class widget St/Gtk
+  (`StScrollBar StButton#vhandle`) ditandai "no mock node", bukan dipilih sepihak.
+- Properti: yang punya padanan web disalin apa adanya; `background-blur`, `spacing`,
+  `border-radius-topleft`, `-st-vfade-offset` didekati (daftar + alasannya di tab mapping);
+  sisanya (`-gtk-icon-*`, `-GtkTreeView-*`) dilaporkan sebagai tak diterjemahkan.
+  Urutan cek penting: tabel aproksimasi sebelum "ini nama properti web" — kalau tidak,
+  `spacing` bocor jadi properti yang browser buang.
+- Data non-CSS yang dipakai mock cuma satu: `panels-height` dari profil gsettings
+  (`--iris-panel-height`), dan itu ditunjukkan di header CSS hasil generate.
+- `preview-base.css` isinya geometri mock saja (flex/grid/posisi + chrome situs). Warna,
+  radius, border, shadow sengaja tidak ada di situ, supaya "elemen X tampil polos" berarti
+  temanya memang tidak punya rule buat X.

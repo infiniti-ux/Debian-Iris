@@ -20,6 +20,7 @@ git clone https://github.com/infiniti-ux/Debian-Iris.git
 cd Debian-Iris
 
 make check                     # validasi statis: selector, schema, desktop file, shell
+make preview                   # lihat hasilnya di browser, di-generate dari file CSS-nya
 sudo ./scripts/install.sh --dry-run --with-session --with-lightdm   # lihat rencana, tidak menulis
 sudo ./scripts/install.sh --all
 ```
@@ -78,6 +79,29 @@ dicek ke sumber upstream sebelum merge, dan installer/uninstaller dijalankan end
 Setiap baris profil diverifikasi terhadap **schema yang terpasang**; key yang tidak dikenal
 Cinnamon dilewati dengan peringatan (bukan ditulis diem-diem jadi sampah dconf).
 
+## Lihat hasilnya tanpa VM: `make preview`
+
+`tools/preview.py` nge-serve mock desktop Cinnamon (panel melayang, menu, kalender,
+notifikasi, OSD, jendela, dan Settings app) yang **styling-nya di-parse langsung dari
+`theme/Iris/cinnamon/cinnamon.css` + `gtk-3.0/gtk.css`** tiap request — jadi nggak ada
+nilai yang disalin tangan, dan edit CSS → reload → berubah.
+
+```bash
+make preview                 # http://localhost:8080   (PORT=9000 make preview buat pindah)
+```
+
+Yang bikin ini bukan sekadar mockup cantik:
+- tab **mapping** daftar tiap rule tema → elemen mock, dan yang *nggak* bisa diterjemahkan
+  dilaporkan, bukan dibuang diem-diem;
+- tab **source** nge-highlight baris CSS yang beneran nyetir render;
+- panel kontrol: blur, alpha surface, skala radius, posisi panel, state backdrop, node labels;
+- klik tile/tab/switch buat ngeliat state `:selected` / `:checked`;
+- `--iris-panel-height` dibaca dari `config/gsettings/iris.gsettings`, bukan dikarang.
+
+Jujur: ini **bukan** renderer GTK/St. Font hinting, biaya blur asli Clutter, dan clip frame
+Muffin beda — pakai ini buat ngecek layout/warna/radius/hierarki, rasa aslinya tetap di sesi
+beneran (daftar deviasinya ada di tab mapping).
+
 ## Kaca / blur — apa yang bisa dan tidak bisa
 
 | Permintaan | Status |
@@ -112,7 +136,7 @@ theme/Iris/          index.theme, cinnamon/cinnamon.css, gtk-3.0/{gtk,gtk-transl
 config/             gsettings profile · live-build package list · hooks
 sessions/           iris.{desktop,session} + varian Wayland
 scripts/            install.sh · uninstall.sh · apply-settings.sh · lib/common.sh
-tools/              check-theme.py (validator) · gen-selectors.py · daftar selector upstream
+tools/              check-theme.py (validator) · gen-selectors.py · preview.py (web mock) · daftar selector upstream
 wallpapers/         iris-aluminium.png
 docs/               DESIGN.md · RESEARCH.md · SAFETY.md
 debian/             .deb (iris-theme)
