@@ -23,18 +23,33 @@ diubah, keduanya harus disinkronkan manual (sengaja, bukan kelalaian).
 | `iris_destructive` | `#d1534a` | hover tombol close |
 | `iris_shadow` | `rgba(40,48,62,.30)` | drop shadow window/menu |
 
-Radius: `14px` window/frame · `12px` control (button/entry) · `16-18px` panel/menu/OSD ·
-`999px` pill (titlebutton, search, toggle, badge).
+**Ladder radius** (sama persis di `gtk-3.0`, `gtk-4.0`, dan `cinnamon.css` — angka-angka
+ini ditulis literal di tiga file, jadi ubahnya pakai script, bukan satu-satu):
+
+| Radius | Untuk |
+|---|---|
+| `18px` | window / surface luar: `decoration`, `window.ssd decoration`, `window.ssd headerbar.titlebar`, `window.csd decoration` |
+| `20px` | sheet GTK: `menu`/`.popup`/`.context-menu`, `popover`, `.notification` |
+| `24px` | drawer + semua dropdown shell: `.popup-menu-content`, `.menu` (satu node dipakai start menu, kalender, tray popup — semuanya ikut; disengaja) |
+| `14px` | `entry`/`textview text`/`.view`, `row`, tile |
+| `12px` | `menuitem`, `tooltip` |
+| `22px` | `.info-osd`, `.osd` (kedua panel full-bleed, radius 0) |
+| `999px` | chip/pill: `button`, `spinbutton`, `.sidebar row`, `.applet-box`, `.window-list-item-box`, `switch`, `.clock-widget`, scrollbar/slider |
+
+Ritme spasi 4px: `row` `8px 12px`, `button` `7px 16px` (min-height 30), `menuitem` `8px 14px`,
+headerbar CSD `min-height: 46px`. Hover menu **tonal** (`rgba(76,127,208,.18)`), bukan accent
+penuh — row yang terisi penuh terbaca "selected", padahal itu state lain.
 Tebal garis: 1px, kecuali indikator aktif taskbar 2px.
 
 ## 2. Permukaan & efek
 
 | Permukaan | File | Efek | Catatan |
 |---|---|---|---|
-| Panel bawah | `cinnamon/cinnamon.css` `.panel-bottom` | `rgba(236,238,241,.78)` + `background-blur: 14`, radius 18, margin 8 → melayang | blur di sini yang paling mahal; kalau frame rate turun saat jendela lewat, turunkan ke `background-blur: 6` atau hapus |
-| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 16, search pill | `background-blur` itu parse int, jadi `12` bukan `12px` |
-| Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 16 | permukaan statis → aman |
-| Frame window (SSD) | `gtk-3.0/gtk.css` `window.ssd decoration` + `window.ssd headerbar.titlebar` | radius 14 di **kedua** node, shadow, titlebutton bulat | Muffin membaca radius dari titlebar (lihat `docs/SAFETY.md` §3) |
+| Panel atas (30px) | `cinnamon/cinnamon.css` `.panel-top` | `rgba(15,17,23,.55)` + `background-blur: 10`, full-bleed, teks `#f2f4f7` via rule turunan `.panel-top …` | jam kiri + tray kanan; teks gelap base di-override semua — kalau ada yang ke-skip, bug-nya teks hilang di bar gelap |
+| Taskbar bawah (60px) | `.panel-bottom` | putih `rgba(255,255,255,.97)`, `background-blur: 0`, hairline atas | menu + separator + grouped-window-list di tengah; state aktif/fokus tonal biru, bukan wash putih (nggak kelihatan di bar putih) |
+| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 24, sheet lavender `rgba(224,227,234,.96)`, search pill putih | `background-blur` itu parse int, jadi `12` bukan `12px` |
+| Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 20 (OSD 22) | permukaan statis → aman |
+| Frame window (SSD) | `gtk-3.0/gtk.css` `window.ssd decoration` + `window.ssd headerbar.titlebar` | radius 18 di **kedua** node, shadow `0 10px 28px 2px`, titlebutton bulat | Muffin membaca radius dari titlebar (lihat `docs/SAFETY.md` §3) |
 | Headerbar CSD | `gtk-3.0/gtk.css` `headerbar` | permukaan datar, border bawah tipis | untuk app GTK yang menggambar titlebar sendiri |
 | Window "glass" | `gtk-3.0/gtk-translucent.css` (opt-in) | translucent, **tanpa** blur | sadar batas: ini palsu; beberapa app akan smear |
 
@@ -78,6 +93,7 @@ config/package-lists/iris-core.list.chroot daftar paket (live-build + --packages
 scripts/install.sh · uninstall.sh · apply-settings.sh · lib/common.sh
 sessions/*.desktop · sessions/*.session   opsi "Iris" di layar login
 tools/check-theme.py · gen-selectors.py   gerbang kualitas (make check)
+tools/preview.py · preview-base.css       web mock: render dari CSS tema (make preview)
 debian/                                   .deb = cara install yang sebenarnya
 ```
 
@@ -128,3 +144,56 @@ Kalau mau sama persis, dua jalur yang jujur:
 2. bikin app Level 1 sendiri ("Iris Control"): shell GTK3 kecil dengan sidebar M3 + search,
    tiap entri manggil `cinnamon-settings <module>` — skin tetap utuh, bisa dihapus tanpa sisa.
    Jalur ini yang direncanakan; lihat `docs/RESEARCH.md` (level 1) dan README "Status & arah".
+
+## 8. `make preview` — cara theme dibaca ulang jadi web mock
+
+`tools/preview.py` adalah penerjemah, bukan theme kedua:
+
+- Parser: stripping komentar (dengan offset newline dipertahankan → nomor baris tetap benar),
+  lalu tiap blok `selector { decls }`. `@define-color` di-parse terpisah dan `@iris_*`
+  di-expand rekursif supaya warna yang dipakai mock memang warna tema.
+- Parser top-level: statement di antara blok (`@define-color iris_accent #…;`) ikut ke-head
+  blok berikutnya kalau head-nya nggak dipotong sampai `;` terakhir — tanpa itu, rule pertama
+  sesudah blok token (di `gtk.css` itu `window { background; color; font-family }`) kebuang
+  dan seluruh jendela kehilangan background + font. Jumlah `{` di file vs jumlah rule hasil
+  parse selalu dicocokin waktu mengubah parser.
+- Selector: `:hover` dibiarkan jadi pseudo asli (browser menangani hover di mock tanpa bantuan);
+  `:focus`/`:active` dan state yang nggak bisa dipegang `<div>` (`:selected`, `:checked`,
+  `:backdrop`, `:highlight`, `:dnd`, `:overview`) dipetakan ke class `.is-*` — kalau tidak,
+  styling state-nya hilang diem-diem dan preview kelihatan "benar". JS preview nyalin
+  `focusin`/`pointerdown` asli ke class `is-focused`/`is-active`, jadi mock tetap interaktif,
+  dan klik tile/tab/switch mengubah `is-selected`/`is-checked`. Selector yang nyebut class widget
+  St/Gtk (`StScrollBar StButton#vhandle`) ditandai "no mock node", bukan dipilih sepihak.
+- Properti: yang punya padanan web disalin apa adanya; `background-blur`, `spacing`,
+  `border-radius-topleft`, `-st-vfade-offset` didekati (daftar + alasannya di tab mapping);
+  sisanya (`-gtk-icon-*`, `-GtkTreeView-*`) dilaporkan sebagai tak diterjemahkan.
+  Urutan cek penting: tabel aproksimasi sebelum "ini nama properti web" — kalau tidak,
+  `spacing` bocor jadi properti yang browser buang.
+- Data non-CSS yang dipakai mock cuma satu: `panels-height` dari profil gsettings
+  (`--iris-panel-height`), dan itu ditunjukkan di header CSS hasil generate.
+- `preview-base.css` isinya geometri mock saja (flex/grid/posisi + chrome situs). Warna,
+  radius, border, shadow sengaja tidak ada di situ, supaya "elemen X tampil polos" berarti
+  temanya memang tidak punya rule buat X. Chrome situsnya sendiri sengaja **terang**:
+  Iris tema terang dan banyak surface-nya `transparent` by design (menuitem, row,
+  `.cs-category-view`), jadi di panggung gelap teksnya hilang dan mock terbaca rusak —
+  itu bug panggung, bukan sinyal soal tema.
+
+### 8.1 Audit reachability — kenapa GUI-nya nggak boleh "kira-kira"
+
+Mock yang meleset separuh lebih buruk daripada tanpa mock: bagian yang nggak kena rule jatuh ke
+`preview-base.css` (geometri, tanpa warna) dan terbaca sebagai "temanya jelek", padahal preview-nya
+yang bolong. Jadi `tools/preview.py` punya audit:
+
+1. generate CSS mock, render DOM mock (semua tab + varian state: `dim`, `hl`, `dnd`);
+2. parse markup-nya sendiri jadi pohon node (tag soup, cukup untuk HTML yang ia generate sendiri);
+3. cocokkan tiap selector hasil translasi terhadap pohon itu — bukan cuma token terakhir, tapi
+   rantai ancestor dengan semantik `>` dan descendant, sambil mengabaikan pseudo runtime
+   (`:hover`, `:focus`) dan class `is-hover/is-focused/is-active` yang disediakan browser/JS;
+4. rule yang tetap nggak mendarat dikasih **auto-demo**: kotak kecil yang membawa class persis
+   seperti selector-nya, muncul di tab **components**, lalu audit diulang.
+
+`make preview-check` (`--print audit`) gagal kalau masih ada selector yang nggak mendarat, dan
+gagal juga kalau jumlah auto-demo lewat `--max-demo 60` — naiknya angka itu artinya rule tema
+berhenti mendarat di widget sungguhan (class di-rename upstream, atau node yang nggak pernah
+dibangun), dan yang rusak pertama kali adalah desktopnya, bukan auditnya. Angka hari ini:
+343 rule dipetakan, 32 cuma lewat auto-demo, 0 unreachable.

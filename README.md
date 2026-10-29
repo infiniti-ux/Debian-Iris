@@ -20,6 +20,18 @@ git clone https://github.com/infiniti-ux/Debian-Iris.git
 cd Debian-Iris
 
 make check                     # validasi statis: selector, schema, desktop file, shell
+make preview                   # lihat hasilnya di browser, di-generate dari file CSS-nya
+make rice                      # pakai skin-nya di sesi Cinnamon kamu, tanpa root/.deb/ISO
+make unrice                    # kembalikan semua yang diubah `make rice`
+```
+
+`make rice` cuma dua hal: symlink `~/.themes/Iris` ke checkout ini, lalu tulis profil gsettings
+ke sesi yang sedang jalan (nilai lamamu di-backup dulu, efeknya live tanpa logout). Bukan
+instalasi sistem — kalau Cinnamon-mu dari distro dan sudah jalan, ini jalur yang benar.
+
+Butuh sesi login sendiri + entry LightDM + `.deb` (jalur turunan distro)? Baru pakai installer:
+
+```bash
 sudo ./scripts/install.sh --dry-run --with-session --with-lightdm   # lihat rencana, tidak menulis
 sudo ./scripts/install.sh --all
 ```
@@ -78,6 +90,39 @@ dicek ke sumber upstream sebelum merge, dan installer/uninstaller dijalankan end
 Setiap baris profil diverifikasi terhadap **schema yang terpasang**; key yang tidak dikenal
 Cinnamon dilewati dengan peringatan (bukan ditulis diem-diem jadi sampah dconf).
 
+## Lihat hasilnya tanpa VM: `make preview`
+
+`tools/preview.py` nge-serve mock desktop Cinnamon (panel melayang, menu, kalender,
+notifikasi, OSD, jendela, dan Settings app) yang **styling-nya di-parse langsung dari
+`theme/Iris/cinnamon/cinnamon.css` + `gtk-3.0/gtk.css`** tiap request — jadi nggak ada
+nilai yang disalin tangan, dan edit CSS → reload → berubah.
+
+```bash
+make preview                 # http://localhost:8080   (PORT=9000 make preview buat pindah)
+```
+
+Yang bikin ini bukan sekadar mockup cantik:
+- **tiap rule tema harus mendarat di elemen mock.** Preview punya audit internal: DOM mock
+  disusun, tiap selector dicocokin ke pohon node (termasuk rantai ancestor), dan yang nggak
+  mendarat dipaksa kelihatan sebagai "auto-demo" di tab components — bukan didiemin.
+  `make preview-check` jadi gerbang di CI (hari ini: 343 rule dipetakan, 0 unreachable);
+- tab **components** nge-render kontrol asli satu-satu (button + variant, entry/focus, switch M3,
+  checkbox, notebook tab, treeview/sidebar, scale/levelbar/progressbar/scrollbar, infobar, tooltip,
+  popover, dialog, systray, window-list & grouped-window-list, appmenu, expo/overview, nemo)
+  pakai nama class yang memang dipakai widget aslinya;
+- tab **mapping** daftar tiap rule tema → elemen mock, dan yang *nggak* bisa diterjemahkan
+  dilaporkan, bukan dibuang diem-diem;
+- tab **source** nge-highlight baris CSS yang beneran nyetir render;
+- panel kontrol: blur, alpha surface, skala radius, posisi panel, state backdrop, panel
+  highlight/dnd, node labels;
+- `:hover` jalan beneran di browser, `:focus`/`:active` disalin dari event ke class yang
+  dicek tema, dan klik tile/tab/switch ngubah `:selected` / `:checked`;
+- `--iris-panel-height` dibaca dari `config/gsettings/iris.gsettings`, bukan dikarang.
+
+Jujur: ini **bukan** renderer GTK/St. Font hinting, biaya blur asli Clutter, dan clip frame
+Muffin beda — pakai ini buat ngecek layout/warna/radius/hierarki, rasa aslinya tetap di sesi
+beneran (daftar deviasinya ada di tab mapping).
+
 ## Kaca / blur — apa yang bisa dan tidak bisa
 
 | Permintaan | Status |
@@ -112,8 +157,8 @@ theme/Iris/          index.theme, cinnamon/cinnamon.css, gtk-3.0/{gtk,gtk-transl
 config/             gsettings profile · live-build package list · hooks
 sessions/           iris.{desktop,session} + varian Wayland
 scripts/            install.sh · uninstall.sh · apply-settings.sh · lib/common.sh
-tools/              check-theme.py (validator) · gen-selectors.py · daftar selector upstream
-wallpapers/         iris-aluminium.png
+tools/              check-theme.py (validator) · gen-selectors.py · preview.py (web mock) · daftar selector upstream
+wallpapers/         iris-aluminium-dark.png
 docs/               DESIGN.md · RESEARCH.md · SAFETY.md
 debian/             .deb (iris-theme)
 ```

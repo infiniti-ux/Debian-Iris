@@ -13,8 +13,9 @@
  *     it small, use it only on surfaces that sit over the wallpaper, and turn it
  *     off on the panel if a window moving behind it costs frames.
  *
- * Style guide: light aluminium surfaces, 14-22px radii, thin cool-grey borders,
- * single soft blue accent (#4C7FD0).
+ * Style guide: Aluminium app-drawer read — dark glass top bar, solid white
+ * full-width taskbar, lavender drawer sheet (24px), thin cool-grey borders,
+ * single soft blue accent (#4C7FD0). Radii ladder lives in docs/DESIGN.md §1.
  * ===========================================================================*/
 
 /* ===== 0. Root / stage ==================================================== */
@@ -50,7 +51,7 @@ StScrollBar StButton#hhandle:hover {
     background-color: rgba(90, 100, 115, 0.55);
 }
 
-/* ===== 1. Panel (floating Windows-11 style taskbar at the bottom) ========= */
+/* ===== 1. Panels (dark top bar + white bottom taskbar, both full-bleed) == */
 .panel {
     font-size: 10pt;
     font-weight: normal;
@@ -62,33 +63,46 @@ StScrollBar StButton#hhandle:hover {
 }
 
 .panel-top {
-    border-radius: 0 0 18px 18px;
-    border-top-width: 0;
+    /* the rice's fixed top bar: dark glass over the wallpaper, white text.
+     * Full-bleed on purpose — a floating pill up here would fight the maximised
+     * window titlebars sitting right under it. */
+    margin: 0;
+    border-radius: 0;
+    border-color: transparent;
+    background-color: rgba(15, 17, 23, 0.55);
+    background-blur: 10;
+    color: #f2f4f7;
+    box-shadow: none;
 }
 
 .panel-bottom {
-    /* floating bar: the margins are what detach it from the screen edge */
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    border-radius: 18px;
+    /* the rice's taskbar: solid white full-width bar, Aluminium-style. Only the
+     * top hairline stays (inherited from .panel); blur is 0 because there is
+     * nothing to see through on an opaque bar, and the GPU thanks us.
+     * For the old floating pill: margin 0 10px 10px + radius 22 — but keep the
+     * white surface, the taskbar items below assume it. */
+    margin: 0;
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
     border-bottom-width: 0;
-    box-shadow: 0 -1px 10px 0 rgba(40, 48, 62, 0.14);
+    background-color: rgba(255, 255, 255, 0.97);
+    background-blur: 0;
+    box-shadow: 0 -1px 10px 0 rgba(40, 48, 62, 0.10);
 }
 
 .panel-left {
-    border-radius: 0 18px 18px 0;
+    border-radius: 0 22px 22px 0;
     border-left-width: 0;
 }
 
 .panel-right {
-    border-radius: 18px 0 0 18px;
+    border-radius: 22px 0 0 22px;
     border-right-width: 0;
 }
 
-/* For a classic full-width bar instead of the floating pill, zero the margins:
- *   .panel-bottom { margin: 0; border-radius: 0; }
- */
+/* Both panels are full-bleed now; the .panel-left/.panel-right radii below only
+ * matter if the user drags a panel to the side. */
 
 #panel {
     color: #1f2430;
@@ -115,10 +129,33 @@ StScrollBar StButton#hhandle:hover {
     background-color: transparent;
 }
 
+/* ===== 1b. Top-bar text (dark bar => every label/icon redeclared white) ====
+ * The base rules below paint applet text dark for the white taskbar; out here
+ * that would be dark-on-dark. Two classes beat one, so these win by specificity
+ * no matter the order. :checked/:focus keep the base blue tints — those read
+ * fine on dark — only :hover gets a white wash instead of a blue one. */
+.panel-top .applet-box,
+.panel-top .applet-label,
+.panel-top .applet-icon,
+.panel-top .system-status-icon,
+.panel-top .clock-time-label,
+.panel-top .clock-date-label {
+    color: #f2f4f7;
+}
+
+.panel-top .applet-box:hover,
+.panel-top .system-status-icon:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.panel-top .applet-separator-line {
+    background-color: rgba(255, 255, 255, 0.22);
+}
+
 /* ===== 2. Applets (generic) =============================================== */
 .applet-box {
-    padding: 4px 8px;
-    border-radius: 12px;
+    padding: 6px 11px;
+    border-radius: 999px;
     color: #1f2430;
     font-weight: normal;
 }
@@ -183,9 +220,9 @@ StScrollBar StButton#hhandle:hover {
 
 .window-list-item-box,
 .grouped-window-list-item-box {
-    padding: 4px 10px;
-    margin: 3px 1px;
-    border-radius: 12px;
+    padding: 5px 14px;
+    margin: 4px 1px;
+    border-radius: 999px;
     color: #1f2430;
     border: 1px solid transparent;
     border-bottom-width: 2px;
@@ -198,14 +235,16 @@ StScrollBar StButton#hhandle:hover {
 
 .window-list-item-box:focus,
 .grouped-window-list-item-box:focus {
-    background-color: rgba(255, 255, 255, 0.60);
+    /* tonal, not white: a white wash is invisible on the white taskbar */
+    background-color: rgba(76, 127, 208, 0.18);
     border-color: rgba(76, 127, 208, 0.55);
 }
 
 .window-list-item-box:active,
 .grouped-window-list-item-box:active,
 .grouped-window-list-item-box:checked {
-    background-color: rgba(255, 255, 255, 0.45);
+    /* same reason: the running-app state must survive a white bar */
+    background-color: rgba(76, 127, 208, 0.24);
     border-bottom-color: #4c7fd0;
 }
 
@@ -264,18 +303,21 @@ StScrollBar StButton#hhandle:hover {
 
 /* ===== 5. Menus (start menu, applet dropdowns, calendar) ================= */
 .popup-menu-content {
+    /* the drawer sheet: lavender, 24px, roomy. This node is shared by the start
+     * menu, the calendar, the tray popups and every applet dropdown, so all of
+     * them read as one family — that is deliberate, not a leak. */
     border: 1px solid rgba(190, 196, 205, 0.9);
-    border-radius: 16px;
-    background-color: rgba(246, 247, 249, 0.90);
+    border-radius: 24px;
+    background-color: rgba(224, 227, 234, 0.96);
     background-blur: 12;
-    box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.22);
-    padding: 8px;
+    box-shadow: 0 12px 32px 2px rgba(40, 48, 62, 0.28);
+    padding: 12px;
     color: #1f2430;
 }
 
 .popup-menu-item {
-    padding: 6px 12px;
-    border-radius: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
     spacing: 8px;
     color: #1f2430;
 }
@@ -337,16 +379,17 @@ StScrollBar StButton#hhandle:hover {
 
 /* the start menu itself (menu@cinnamon.org / Cinnamenu) */
 .menu {
-    border-radius: 16px;
+    border-radius: 24px;
+    padding: 4px;
 }
 
 #menu-search-entry,
 #appmenu-search-entry {
     width: 22em;
-    padding: 7px 12px;
-    border: 1px solid rgba(190, 196, 205, 0.9);
+    padding: 9px 16px;
+    border: 1px solid transparent;
     border-radius: 999px;
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: #ffffff;
     color: #1f2430;
     font-size: 10pt;
     selected-color: #ffffff;
@@ -366,8 +409,8 @@ StScrollBar StButton#hhandle:hover {
 
 .appmenu-application-button,
 .appmenu-category-button {
-    padding: 6px 8px;
-    border-radius: 10px;
+    padding: 8px 10px;
+    border-radius: 14px;
     color: #1f2430;
 }
 
@@ -400,8 +443,8 @@ StScrollBar StButton#hhandle:hover {
  * (`.calendar-day-selected` / `.datemenu-*` do not exist — those are GNOME's.)
  */
 .clock-widget {
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
 }
 
 .clock-time-label {
@@ -425,8 +468,8 @@ StScrollBar StButton#hhandle:hover {
 
 .calendar-day-base {
     text-align: center;
-    width: 2.4em;
-    height: 2.4em;
+    width: 2.6em;
+    height: 2.6em;
     font-size: 9pt;
     border-radius: 9999px;
     color: rgba(31, 36, 48, 0.75);
@@ -531,9 +574,9 @@ StScrollBar StButton#hhandle:hover {
 .notification,
 #notification {
     width: 28em;
-    padding: 10px 12px;
+    padding: 12px 16px;
     border: 1px solid rgba(190, 196, 205, 0.9);
-    border-radius: 16px;
+    border-radius: 20px;
     background-color: rgba(246, 247, 249, 0.90);
     background-blur: 12;
     box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.20);
@@ -580,9 +623,9 @@ StScrollBar StButton#hhandle:hover {
 .info-osd,
 .media-keys-osd,
 .workspace-switch-osd {
-    padding: 12px 16px;
+    padding: 14px 20px;
     border: 1px solid rgba(190, 196, 205, 0.9);
-    border-radius: 16px;
+    border-radius: 22px;
     background-color: rgba(246, 247, 249, 0.88);
     background-blur: 12;
     box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.20);

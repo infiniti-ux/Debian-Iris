@@ -130,6 +130,25 @@ while IFS= read -r raw || [ -n "$raw" ]; do
         continue
     fi
 
+    # Profile tokens: @IRIS_WALLPAPER@ resolves to the wallpaper that actually
+    # exists — the system copy when installed (.deb / install.sh), else the
+    # per-user copy `make rice` drops in ~/.local/share/backgrounds, else the
+    # file in this checkout (applying straight from git). $HOME is useless here
+    # when running under sudo, so the home dir comes from getent. Restore files
+    # carry concrete values, so this is a no-op on --restore.
+    if [[ "$value" == *"@IRIS_WALLPAPER@"* ]]; then
+        _bg_home="$(getent passwd "$TARGET_USER" 2>/dev/null | cut -d: -f6 || true)"
+        if [ -f "/usr/share/backgrounds/iris-aluminium-dark.png" ]; then
+            _bg="file:///usr/share/backgrounds/iris-aluminium-dark.png"
+        elif [ -n "$_bg_home" ] && [ -f "$_bg_home/.local/share/backgrounds/iris-aluminium-dark.png" ]; then
+            _bg="file://$_bg_home/.local/share/backgrounds/iris-aluminium-dark.png"
+        else
+            _bg="file://$REPO_DIR/wallpapers/iris-aluminium-dark.png"
+        fi
+        value="${value//@IRIS_WALLPAPER@/$_bg}"
+        unset _bg _bg_home
+    fi
+
     if ! schema_known "$schema"; then
         warn "unknown schema: $schema (line $lineno) — skipped"
         unknown=$((unknown + 1)); unknown_list+=("$schema.$key [no schema]")

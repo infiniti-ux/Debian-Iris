@@ -80,7 +80,7 @@ if [ "$WITH_PACKAGES" = 1 ] && graphical_session_active && [ "$FORCE" != 1 ]; th
     exit 1
 fi
 
-plan=("theme -> /usr/share/themes/Iris" "wallpaper -> /usr/share/backgrounds/iris-aluminium.png")
+plan=("theme -> /usr/share/themes/Iris" "wallpaper -> /usr/share/backgrounds/iris-aluminium-dark.png")
 [ "$WITH_SESSION" = 1 ]  && plan+=("sessions -> xsessions/iris.desktop, wayland-sessions/iris-wayland.desktop, cinnamon-session/sessions/iris*.session")
 [ "$WITH_LIGHTDM" = 1 ]  && plan+=("lightdm drop-in -> /etc/lightdm/lightdm.conf.d/60-iris.conf")
 [ "$WITH_SETTINGS" = 1 ] && plan+=("gsettings profile for $TARGET_USER")
@@ -123,7 +123,7 @@ fi
 log "theme installed at /usr/share/themes/Iris"
 
 step "Installing wallpaper"
-install_file "${REPO_DIR}/wallpapers/iris-aluminium.png" "/usr/share/backgrounds/iris-aluminium.png" 0644
+install_file "${REPO_DIR}/wallpapers/iris-aluminium-dark.png" "/usr/share/backgrounds/iris-aluminium-dark.png" 0644
 install_file "${REPO_DIR}/config/gsettings/iris.gsettings" "/usr/share/iris/iris.gsettings" 0644
 
 if [ "$WITH_SESSION" = 1 ]; then

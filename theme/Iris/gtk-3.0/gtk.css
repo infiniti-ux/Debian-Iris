@@ -32,8 +32,20 @@
 @define-color iris_destructive #d1534a;
 @define-color iris_shadow      rgba(40, 48, 62, 0.30);
 
-/* radii: 4 steps, M3-Expressive-ish. GTK CSS has no variables, so these are
- * repeated literal values — change them with sed, not by hand. */
+/* Radii ladder (kept identical in the gtk-4.0 twin and the cinnamon theme):
+ *   18  window / outer surface  — Muffin clips the client area to the TITLEBAR
+ *                                 radius, so `decoration`, `window.ssd
+ *                                 headerbar.titlebar` and `.csd decoration` must
+ *                                 carry the same number or the corners tear.
+ *   20  sheets: menus, popovers, notifications (panel pill + OSD use 22)
+ *   14  list rows, tiles, entries
+ *   12  menu items, tooltips
+ *  999 controls meant to read as chips/pills: buttons, sidebar rows, switches,
+ *       scrollbars, progress/scale troughs, panel applets, window-list items
+ * Spacing sits on a 4px rhythm (rows 8/12, buttons 7/16, menu items 8/14) so a
+ * row and the button next to it carry the same air.
+ * GTK CSS has no variables, so these are repeated literal values — change them
+ * with sed or a script, never one by one. */
 
 /* ===== 1. Windows, frames, shadows ======================================= */
 window {
@@ -43,16 +55,16 @@ window {
 }
 
 window.background.csd {
-    border-radius: 14px;
+    border-radius: 18px;
 }
 
 /* CSD + SSD outer frame: this is where "rounded window" actually comes from */
 decoration {
-    border-radius: 14px;
+    border-radius: 18px;
     background-color: @iris_window;
     border: 1px solid @iris_outline;
-    margin: 10px;
-    box-shadow: 0 6px 18px 2px @iris_shadow;
+    margin: 12px;
+    box-shadow: 0 10px 28px 2px @iris_shadow;
 }
 
 decoration:backdrop {
@@ -73,15 +85,15 @@ decoration.solid-csd {
 /* Muffin SSD chrome. The border-radius on `headerbar` is read by Muffin to
  * clip the client area — keep it equal to the decoration radius. */
 window.ssd decoration {
-    border-radius: 14px 14px 14px 14px;
+    border-radius: 18px 18px 18px 18px;
     padding: 0;
     background-color: @iris_window;
 }
 
 window.ssd headerbar.titlebar {
-    border-radius: 14px 14px 0 0;
-    min-height: 34px;
-    padding: 0 6px;
+    border-radius: 18px 18px 0 0;
+    min-height: 40px;
+    padding: 0 10px;
     background-image: none;
     background-color: @iris_surface;
     border-bottom: 1px solid @iris_outline_soft;
@@ -93,11 +105,26 @@ window.ssd headerbar.titlebar:backdrop {
 }
 
 window.ssd decoration:backdrop {
-    border-radius: 14px;
+    border-radius: 18px;
 }
 
 window.ssd headerbar.titlebar.default-decoration {
-    min-height: 30px;
+    min-height: 34px;
+}
+
+/* App toolbars — Nemo's location row and cinnamon-settings' #top_bar (a
+ * GtkToolbar.primary-toolbar). Same soft surface as the headerbar so a window reads
+ * as "header + body" instead of one flat sheet; scoped to the node, never to `*`. */
+toolbar,
+.primary-toolbar {
+    background-color: @iris_surface;
+    border-bottom: 1px solid @iris_outline_soft;
+    padding: 6px 10px;
+}
+
+toolbar:backdrop,
+.primary-toolbar:backdrop {
+    background-color: rgba(247, 248, 250, 0.92);
 }
 
 window.ssd decoration button.titlebutton {
@@ -111,8 +138,8 @@ window.ssd decoration button.titlebutton {
 /* ===== 2. Headerbars / titlebars (CSD) =================================== */
 headerbar,
 .titlebar {
-    min-height: 40px;
-    padding: 0 8px;
+    min-height: 46px;
+    padding: 0 12px;
     background-image: none;
     background-color: @iris_surface;
     color: @iris_fg;
@@ -138,8 +165,8 @@ headerbar .subtitle {
 }
 
 headerbar button.titlebutton {
-    min-width: 24px;
-    min-height: 24px;
+    min-width: 28px;
+    min-height: 28px;
     padding: 0;
     border-radius: 999px;
 }
@@ -151,11 +178,11 @@ headerbar button.titlebutton.close:hover {
 
 /* ===== 3. Buttons ======================================================== */
 button {
-    min-height: 24px;
+    min-height: 30px;
     min-width: 16px;
-    padding: 5px 12px;
+    padding: 7px 16px;
     margin: 1px;
-    border-radius: 10px;
+    border-radius: 999px;
     border: 1px solid @iris_outline;
     background-image: none;
     background-color: @iris_base;
@@ -219,15 +246,23 @@ button.toggle,
 
 /* ===== 4. Entries, spinbuttons, text ===================================== */
 entry,
-textview text,
-.view {
+textview text {
     background-color: @iris_base;
     color: @iris_fg;
     border: 1px solid @iris_outline;
-    border-radius: 10px;
-    padding: 5px 10px;
-    min-height: 20px;
+    border-radius: 14px;
+    padding: 7px 12px;
+    min-height: 24px;
     caret-color: @iris_accent;
+}
+
+/* `.view` is any plain tree / icon / list pane (Nemo's file view, the settings
+ * category view). It gets the paper colour only: the field border and field padding
+ * on that node outline every pane in the desktop, which is exactly how a light theme
+ * starts reading as a stack of boxes. The gtk-4.0 twin already separates them. */
+.view {
+    background-color: @iris_base;
+    color: @iris_fg;
 }
 
 entry:focus,
@@ -258,7 +293,7 @@ entry image {
 }
 
 spinbutton {
-    border-radius: 10px;
+    border-radius: 999px;
     border: 1px solid @iris_outline;
     background-color: @iris_base;
 }
@@ -294,8 +329,8 @@ list row:hover {
 }
 
 row {
-    padding: 3px 6px;
-    border-radius: 8px;
+    padding: 8px 12px;
+    border-radius: 14px;
 }
 
 /* ===== 6. Menus and popovers ============================================ */
@@ -305,22 +340,24 @@ menu,
 .context-menu {
     background-color: rgba(247, 248, 250, 0.98);
     border: 1px solid @iris_outline;
-    border-radius: 12px;
-    padding: 6px;
-    box-shadow: 0 6px 22px 2px @iris_shadow;
+    border-radius: 20px;
+    padding: 8px;
+    box-shadow: 0 12px 30px 2px rgba(40, 48, 62, 0.24);
 }
 
 menu menuitem,
 menuitem {
-    padding: 5px 10px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border-radius: 12px;
     color: @iris_fg;
 }
 
+/* M3 marks a hovered item tonally; a fully filled accent row reads as selected,
+ * which is a different state in a menu. */
 menu menuitem:hover,
 menuitem:hover {
-    background-color: @iris_accent;
-    color: @iris_accent_fg;
+    background-color: rgba(76, 127, 208, 0.18);
+    color: @iris_fg;
 }
 
 menu separator,
@@ -334,9 +371,9 @@ popover,
 popover.background {
     background-color: rgba(247, 248, 250, 0.98);
     border: 1px solid @iris_outline;
-    border-radius: 14px;
-    padding: 8px;
-    box-shadow: 0 8px 26px 2px @iris_shadow;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 12px 30px 2px rgba(40, 48, 62, 0.24);
 }
 
 popover > arrow {
@@ -350,7 +387,7 @@ notebook > header {
 }
 
 notebook > header > tabs > tab {
-    padding: 5px 14px;
+    padding: 8px 18px;
     border-radius: 999px;
     border: 1px solid transparent;
     background-color: transparent;
@@ -389,9 +426,9 @@ placessidebar,
 .sidebar row,
 stacksidebar row,
 placessidebar row {
-    padding: 8px 12px;
+    padding: 9px 14px;
     border-radius: 999px;
-    min-height: 30px;
+    min-height: 34px;
 }
 
 .sidebar row:selected,
@@ -533,8 +570,8 @@ infobar,
 .info,
 .warning,
 .error {
-    padding: 8px 12px;
-    border-radius: 12px;
+    padding: 10px 14px;
+    border-radius: 16px;
     background-color: @iris_surface;
     color: @iris_fg;
     border: 1px solid @iris_outline_soft;
@@ -553,8 +590,8 @@ infobar.warning {
 tooltip {
     background-color: rgba(31, 36, 48, 0.94);
     color: #f2f4f7;
-    border-radius: 8px;
-    padding: 4px 8px;
+    border-radius: 12px;
+    padding: 6px 11px;
     box-shadow: none;
 }
 
@@ -567,9 +604,9 @@ tooltip label {
     background-color: rgba(247, 248, 250, 0.94);
     color: @iris_fg;
     border: 1px solid @iris_outline;
-    border-radius: 14px;
-    padding: 10px;
-    box-shadow: 0 8px 26px 2px @iris_shadow;
+    border-radius: 22px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 30px 2px rgba(40, 48, 62, 0.24);
 }
 
 .osd button {
@@ -590,11 +627,21 @@ statusbar {
     -GtkTreeView-vertical-separator: 2;
 }
 
-/* desktop icons are drawn by nemo-desktop: keep the label legible on a light
- * aluminium wallpaper */
+/* desktop icons are drawn by nemo-desktop straight onto the wallpaper, which is
+ * dark now — so the labels need their own paint or they inherit window fg (dark)
+ * and vanish. Mint-Y does exactly this (white + shadow on the canvas item). */
 .nemo-desktop.nemo-desktop-icon-view,
 .nemo-desktop iconview {
     background-color: transparent;
+}
+
+.nemo-desktop.nemo-canvas-item {
+    color: #f2f4f7;
+    text-shadow: 1px 1px rgba(10, 12, 16, 0.6);
+}
+
+.nemo-desktop.nemo-canvas-item:selected {
+    color: #ffffff;
 }
 
 /* ===== 13. cinnamon-settings (the Settings app) ==========================
@@ -780,8 +827,8 @@ statusbar {
 }
 
 #content_box row {
-    padding: 6px 10px;
-    min-height: 30px;
+    padding: 9px 12px;
+    min-height: 34px;
 }
 
 #content_box separator {

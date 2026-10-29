@@ -1,0 +1,433 @@
+/* ===========================================================================
+ * tools/preview-base.css — MOCK SCAFFOLDING, not part of the theme.
+ *
+ * Everything in here is layout for the fake desktop (positions, flex, grid,
+ * the preview site's own chrome). It deliberately contains no colours, radii,
+ * borders or shadows that are meant to represent Iris: those must come from
+ * theme/Iris/**.css, or the preview would be showing this file instead of the
+ * theme. If a mock element looks unstyled, that is the honest answer — the
+ * theme has no rule for it.
+ *
+ * The chrome (site background, cards, tables) is light on purpose: Iris is a light
+ * theme and leaves many surfaces deliberately transparent, so on a dark stage those
+ * elements would render as invisible text and read as "the theme is broken".
+ *
+ * Two exceptions, both derived from repo data rather than invented:
+ *   --iris-panel-height  read from config/gsettings/iris.gsettings
+ *   --iris-icon-size     copied from `icon-size` in cinnamon.css
+ * =========================================================================*/
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #f4f5f8;
+  color: #1c2129;
+  font: 13px/1.45 ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  /* the theme is light, so the room it is shown in is light too: elements the
+   * theme leaves transparent would otherwise vanish on a dark background */
+}
+
+.desk {
+  position: absolute;
+  inset: 0 320px 0 0;
+  overflow: hidden;
+  background: #cfd6e0;
+  color: #1c2129;
+}
+
+.wallpaper { position: absolute; inset: 0; }
+.wallpaper img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.desk.grid .wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right, rgba(255,255,255,.10) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(to bottom, rgba(255,255,255,.10) 0 1px, transparent 1px 8px);
+  pointer-events: none;
+}
+
+/* ---- windows ------------------------------------------------------------ */
+.t-window { position: absolute; display: block; }
+.t-decoration {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.t-window.win-settings { left: 5%; top: 6%; width: 62%; height: 74%; }
+.t-window.win-files    { left: 46%; top: 16%; width: 40%; height: 44%; }
+.t-window.win-editor   { left: 12%; top: 58%; width: 34%; height: 26%; }
+.t-headerbar { display: flex; align-items: center; gap: 8px; }
+.win-icon { opacity: .8; }
+.t-titlebar .t-title { flex: 0 1 auto; }
+.t-titlebar .t-subtitle { flex: 0 1 auto; }
+.t-window-controls { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.t-titlebar .spacer { flex: 1 1 auto; }
+.titlebutton { display: inline-grid; place-items: center; }
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+/* ---- Settings app mock (mirrors cinnamon-settings' widget tree) --------- */
+#t-top_bar { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+#t-top_bar #t-button_back { display: grid; place-items: center; flex: 0 0 auto; }
+#t-top_bar #t-search_box { flex: 1 1 auto; min-width: 0; }
+#t-top_bar #t-search_box .t-entry { display: flex; align-items: center; gap: 8px; }
+#t-top_bar #t-search_box .spacer { flex: 1 1 auto; }
+#t-header_stack > .t-box { align-items: center; gap: 8px; }
+#t-box2 { flex: 0 0 auto; }
+#t-content_box .t-border { display: block; }
+#t-stack_switcher { display: flex; align-items: center; }
+#t-stack_switcher .t-button { white-space: nowrap; }
+
+/* The real app swaps #t-main_stack between the category page and the module
+ * page; the mock shows both so you can see both styles at once (see the
+ * "Mock deviations" list in the mapping tab). */
+.t-stack { min-height: 0; }
+/* the header row of Cinnamon Settings: search field left, back + switcher right */
+#t-header_stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#t-hbox2 { flex: 1 1 auto; min-width: 0; }
+.t-scrolledwindow { min-height: 0; overflow: auto; }
+.t-viewport { min-width: 0; }
+.t-box { display: flex; }
+.t-vertical { flex-direction: column; }
+.t-horizontal { flex-direction: row; align-items: center; }
+.cat-head { gap: 8px; }
+.cat-icon { font-size: 1.15em; }
+.t-iconview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.t-iconview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.t-iconview-item .glyph { font-size: 1.8em; line-height: 1; }
+.t-frame > .t-border > .t-box { display: flex; flex-direction: column; }
+.t-row { display: flex; align-items: center; gap: 12px; }
+.t-row-text, .row-text { display: flex; flex-direction: column; min-width: 0; }
+.t-row-text { flex: 1 1 auto; }
+.t-list-row .t-label:first-of-type { flex: 0 1 auto; }
+.t-list { display: flex; flex-direction: column; flex: 1 1 auto; }
+.t-select { display: flex; align-items: center; gap: 10px; }
+.nemo-bar { display: flex; align-items: center; gap: 6px; }
+.nemo-bar .t-entry { flex: 1 1 auto; display: flex; align-items: center; }
+.t-textview { display: flex; flex-direction: column; gap: 4px; }
+
+/* ---- switches / sliders (geometry only; the theme owns size + colour) --- */
+.t-switch { display: inline-flex; align-items: center; justify-content: flex-start; }
+.t-switch.is-checked { justify-content: flex-end; }
+.t-slider { height: 100%; aspect-ratio: 1; }
+.t-progress { position: relative; overflow: hidden; flex: 1 1 auto; }
+.t-progress-box { position: absolute; inset: 0 auto 0 0; width: 42%; }
+
+/* ---- calendar / media --------------------------------------------------- */
+.t-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.t-calendar-day-base, .t-calendar-day-heading { text-align: center; }
+.t-calendar-month-label { display: flex; align-items: center; justify-content: space-between; }
+.t-sound-player { display: flex; align-items: center; gap: 10px; }
+.t-albumart-widget { display: grid; place-items: center; }
+.player-text { display: flex; flex-direction: column; min-width: 0; }
+
+/* ---- menus / popups / notifications / OSD ------------------------------- */
+.menu-cols { display: grid; grid-template-columns: 132px minmax(0, 1fr); }
+.menu-cats, .menu-apps { display: flex; flex-direction: column; }
+.menu-apps { display: grid; grid-template-columns: repeat(4, 1fr); align-content: start; }
+.menu-footer { display: flex; gap: 6px; justify-content: flex-end; }
+.t-app-well { display: flex; align-items: center; gap: 8px; }
+.t-app-well .glyph { font-size: 1.4em; }
+/* Desktop icon labels are painted white by the GTK theme because they sit on the
+ * dark wallpaper; the well stands in for that wallpaper in the Components tab so
+ * the rule can be judged. The colour is the profile's
+ * org.cinnamon.desktop.background primary-color fallback, not a theme value. */
+.desktop-well { background: #14161c; border-radius: 14px; padding: 14px; }
+
+.t-popup-menu, .calendar-menu { display: flex; flex-direction: column; }
+.t-menu, #t-nemo-menu {
+  position: absolute;
+  left: 52%;
+  top: 44%;
+  width: 210px;
+  z-index: 6;
+}
+.cal-anchor { position: absolute; right: 4%; bottom: 12%; width: 300px; z-index: 6; }
+.popup-menu {
+  position: absolute;
+  /* the rice's menu button sits in the taskbar centre, so the drawer opens
+   * centred above it — not corner-anchored */
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 12%;
+  width: 480px;
+  z-index: 7;
+}
+.t-notification {
+  position: absolute;
+  right: 4%;
+  top: 8%;
+  width: 330px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  z-index: 8;
+}
+.notif-body { display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; }
+.notif-title { font-weight: 600; }
+.notif-action { align-self: flex-start; }
+.notif-close { flex: 0 0 auto; }
+
+.t-info-osd { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); z-index: 9; }
+.t-altTabPopup {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+}
+.t-switcher-list { display: flex; gap: 6px; }
+.t-item-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+/* ---- panel -------------------------------------------------------------- */
+.t-panel {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: var(--iris-panel-height, 44px);
+  z-index: 10;
+}
+.t-panel-bottom { left: 0; right: 0; bottom: 0; }
+.t-panel-top { left: 0; right: 0; top: 0; }
+/* the rice's fixed top bar is 30px while the taskbar is 60px (gsettings
+ * panels-height); the mock honours both so the proportions judge honestly */
+.rice-topbar { height: 30px; }
+.t-panel-left, .t-panel-right {
+  top: 0;
+  bottom: 0;
+  width: var(--iris-panel-height, 44px);
+  height: auto;
+  flex-direction: column;
+}
+.t-panel-left { left: 0; }
+.t-panel-right { right: 0; }
+.t-panel-left .t-panel-center, .t-panel-right .t-panel-center { flex-direction: column; }
+.t-panel-left > div, .t-panel-right > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  gap: 2px;
+}
+.t-panel > div { display: flex; align-items: center; height: 100%; }
+#t-panelLeft { flex: 0 0 auto; gap: 2px; }
+#t-panelCenter { flex: 1 1 auto; justify-content: center; gap: 4px; }
+#t-panelRight { flex: 0 0 auto; gap: 2px; justify-content: flex-end; }
+.t-applet-box { display: flex; align-items: center; gap: 6px; }
+.t-panel-menu-button { gap: 7px; }
+.window-list-label, .t-window-list-item-label {
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.t-clock-box { flex-direction: column; align-items: flex-end; line-height: 1.05; }
+.t-applet-separator { display: grid; place-items: center; }
+.t-applet-separator-line { width: 1px; height: 60%; }
+.glyph { display: inline-grid; place-items: center; line-height: 1; }
+
+/* node labels mode: shows which theme node each box stands for */
+.desk.labels [data-node]::after {
+  content: attr(data-node);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font: 9px/1 ui-monospace, monospace;
+  padding: 1px 3px;
+  background: #ffe98a;
+  color: #1c2129;
+  border-radius: 2px;
+  opacity: .85;
+  pointer-events: none;
+  z-index: 12;
+}
+.desk.labels [data-node] { position: relative; }
+
+/* ---- preview site chrome (NOT the theme) -------------------------------- */
+.controls {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fbfcfd;
+  border-left: 1px solid #dde2ea;
+  overflow: auto;
+}
+.ctl-head { display: flex; flex-direction: column; }
+.ctl-head b { font-size: 15px; }
+.ctl-head small { color: #5b6675; }
+.controls label { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.controls label > input[type=range] { flex: 1 1 120px; }
+.controls output { color: #2c5fa8; font-variant-numeric: tabular-nums; }
+.controls select { flex: 1 1 100%; background: #fff; color: inherit; border: 1px solid #cfd6e0; border-radius: 8px; padding: 3px 6px; }
+.toggles { display: flex; flex-direction: column; gap: 4px; }
+.tabs { display: flex; gap: 4px; }
+.tabs a {
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 5px 8px;
+  border: 1px solid #cfd6e0;
+  border-radius: 999px;
+  color: #3a4658;
+  text-decoration: none;
+}
+.tabs a.on { background: #e2e8f2; color: #16202e; border-color: #b9c6da; }
+.warn { color: #5b6675; font-size: 12px; }
+.warn a { color: #2c5fa8; }
+
+.doc { position: absolute; inset: 0 320px 0 0; overflow: auto; padding: 18px 22px 60px; }
+.doc h2 { margin: 22px 0 6px; font-size: 15px; }
+.doc h2:first-child { margin-top: 0; }
+.doc .lead { color: #5b6675; max-width: 78ch; }
+.doc table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.doc th, .doc td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e6eaf0; vertical-align: top; }
+.doc th { color: #5b6675; font-weight: 600; }
+.doc td.props code { color: #1f6b4a; }
+.doc code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+.doc ul { padding-left: 18px; }
+.doc li { margin: 3px 0; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.sw { display: flex; align-items: center; gap: 8px; }
+.sw i { width: 22px; height: 22px; border-radius: 8px; border: 1px solid #cfd6e0; display: inline-block; }
+ol.src { list-style: none; margin: 0; padding: 0; font-size: 11.5px; background: #fff; border: 1px solid #e2e6ec; border-radius: 14px; }
+ol.src li { display: flex; gap: 10px; padding: 0 8px; white-space: pre; }
+ol.src li .no { color: #9aa5b4; min-width: 3.5ch; text-align: right; user-select: none; }
+ol.src li.hit { background: rgba(44, 95, 168, .12); }
+ol.src code { color: #31404f; }
+.deviations li { color: #8a5a12; }
+
+/* ---- panel nodes, named as cinnamon names them -------------------------- */
+.t-panel-launchers, .t-launcher { display: flex; align-items: center; }
+.t-window-list { display: flex; align-items: center; gap: 4px; }
+.t-window-list-item-box, .t-grouped-window-list-item-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.t-window-list-item-label { min-width: 0; }
+.t-systray { display: flex; align-items: center; }
+.t-spacer-box { flex: 1 1 auto; min-width: 8px; }
+.t-panel-corner { position: absolute; width: 22px; height: 100%; top: 0; }
+.t-panel-left .t-panel-corner, .t-panel-right .t-panel-corner {
+  width: 100%;
+  height: 22px;
+  top: auto;
+}
+.t-clock-widget { display: flex; flex-direction: column; align-items: flex-end; }
+#t-panelLeft, #t-panelCenter, #t-panelRight { position: relative; }
+
+/* ---- Components tab ------------------------------------------------------ */
+/* The gallery reuses the desktop's nodes, so it has to undo the parts of the
+ * scaffolding that are about being a desktop: absolute windows, fixed panel. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.card {
+  border: 1px solid #e2e6ec;
+  border-radius: 18px;
+  padding: 12px 14px 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 33, 41, 0.05);
+  min-width: 0;
+}
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #5b6675;
+}
+.card-title { margin: 0 0 8px; font-size: 11px; color: #5b6675; }
+.card .row,
+.card .boxlist { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.card .boxlist { flex-direction: column; align-items: stretch; }
+.card .thumb { display: grid; place-items: center; width: 30px; height: 22px; }
+.card .note { font-size: 11px; color: #5b6675; }
+.card .t-window,
+.card .t-notification,
+.card .t-menu,
+.card .popup-menu,
+.card .t-info-osd,
+.card .t-altTabPopup,
+.card .t-panel {
+  position: static;
+  inset: auto;
+  width: auto;
+  height: auto;
+  transform: none;
+  z-index: auto;
+}
+.card .t-window { display: inline-flex; flex-direction: column; min-width: 220px; }
+.card .t-decoration { height: auto; }
+.card .t-panel { align-items: stretch; padding: 0 6px; }
+.hint { font-size: 11px; color: #5b6675; margin: 6px 0 0; max-width: 60ch; }
+.panelrow { display: flex; align-items: center; gap: 6px; height: 40px; }
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px dashed #c3cddd;
+  border-radius: 14px;
+  background: #f7f9fc;
+  min-width: 0;
+}
+.demo > code { color: #5b6675; font-size: 10.5px; word-break: break-all; }
+.demo > div { display: flex; flex-direction: column; gap: 4px; padding: 4px 6px; }
+.t-check, .t-radio { width: 16px; height: 16px; flex: 0 0 auto; }
+.t-checkbutton, .t-radiobutton { display: flex; align-items: center; gap: 8px; }
+.t-scale, .t-levelbar, .t-progressbar { min-width: 140px; }
+.t-scale .t-trough, .t-levelbar .t-trough { display: flex; align-items: center; min-height: 18px; }
+.t-levelbar .t-block { flex: 1 1 auto; height: 10px; }
+.t-scrollbar { width: 10px; min-height: 60px; }
+.t-scrollbar .t-overlay-indicator { height: 100%; }
+.t-notebook > .t-header { display: flex; }
+.t-notebook .t-tabs { display: flex; gap: 2px; }
+.t-infobar, .t-statusbar, .t-tooltip, .t-popover { display: inline-flex; align-items: center; }
+.t-dialog { display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
+.t-dialog-content { display: flex; flex-direction: column; gap: 8px; }
+.t-dialog-button-box { display: flex; gap: 8px; justify-content: flex-end; }
+.t-textview { min-height: 44px; }
+.t-iconview-item { position: relative; }
+.t-settings-body {
+  display: grid;
+  grid-template-columns: 250px auto minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.card .t-settings-body { grid-template-columns: minmax(0, 1fr); }

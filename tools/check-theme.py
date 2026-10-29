@@ -247,7 +247,29 @@ FORBIDDEN_KEYS = {
 }
 
 
+GSETTINGS_ALLOWLIST_PATH = "tools/upstream-gsettings.txt"
+
+
+def load_gsettings_allowlist(root: str) -> set[tuple[str, str]] | None:
+    """(schema, key) pairs from tools/gen-gsettings.py; None when not generated."""
+    path = os.path.join(root, GSETTINGS_ALLOWLIST_PATH)
+    if not os.path.isfile(path):
+        return None
+    out: set[tuple[str, str]] = set()
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("#") or "\t" not in line:
+            continue
+        schema, key = line.rstrip("\n").split("\t")[:2]
+        out.add((schema, key))
+    return out or None
+
+
 def check_gsettings_profile(root: str, rep: Report) -> None:
+    allow = load_gsettings_allowlist(root)
+    if allow is None:
+        rep.warn(GSETTINGS_ALLOWLIST_PATH,
+                 "allowlist missing — key-existence check disabled (run `make gsettings`"
+                 " against a real Cinnamon install, or commit the generated file)")
     path = os.path.join(root, "config/gsettings/iris.gsettings")
     if not os.path.isfile(path):
         rep.err("config/gsettings/iris.gsettings", "missing")
@@ -267,8 +289,19 @@ def check_gsettings_profile(root: str, rep: Report) -> None:
             rep.err(where, f"unknown schema '{schema}'")
         if (schema, key) in FORBIDDEN_KEYS:
             rep.err(where, f"'{schema} {key}' does not exist in Cinnamon (inert config)")
+        # dconf accepts ANY name, so an invented or renamed key is silent dead weight:
+        # without a schema that owns it, nothing ever reads it. The allowlist is
+        # generated from upstream schema files, so this is a fact, not a taste.
+        if allow is not None and (schema, key) not in allow:
+            rep.err(where, f"'{schema} {key}' is not defined by any upstream schema "
+                           "(inert config — verify in the .gschema.xml, then `make gsettings`)")
         if not value:
             rep.err(where, "empty value")
+        # @IRIS_WALLPAPER@ is expanded by apply-settings.sh; the file it points
+        # at must exist in the repo or every apply path writes a dangling uri.
+        if "@IRIS_WALLPAPER@" in value and not os.path.isfile(
+                os.path.join(root, "wallpapers/iris-aluminium-dark.png")):
+            rep.err(where, "wallpapers/iris-aluminium-dark.png missing")
         if (schema, key) in seen:
             rep.err(where, f"duplicate entry for {schema} {key}")
         seen.add((schema, key))

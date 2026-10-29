@@ -27,6 +27,13 @@ jobs:
       - name: validate everything
         run: make check && make check-strict
 
+      # The preview is the only way to look at this theme without a session, so it
+      # is gated too: a theme rule that reaches no mock element makes that corner of
+      # the fake desktop fall back to unstyled scaffolding, which reads as a broken
+      # theme instead of an incomplete mock.
+      - name: preview mock covers every theme rule
+        run: make preview-check
+
       # style findings depend on the shellcheck version, so the blocking half is
       # limited to real errors and the advisory half is allowed to speak freely.
       - name: shellcheck (errors block)
