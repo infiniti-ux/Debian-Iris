@@ -23,18 +23,31 @@ diubah, keduanya harus disinkronkan manual (sengaja, bukan kelalaian).
 | `iris_destructive` | `#d1534a` | hover tombol close |
 | `iris_shadow` | `rgba(40,48,62,.30)` | drop shadow window/menu |
 
-Radius: `14px` window/frame · `12px` control (button/entry) · `16-18px` panel/menu/OSD ·
-`999px` pill (titlebutton, search, toggle, badge).
+**Ladder radius** (sama persis di `gtk-3.0`, `gtk-4.0`, dan `cinnamon.css` — angka-angka
+ini ditulis literal di tiga file, jadi ubahnya pakai script, bukan satu-satu):
+
+| Radius | Untuk |
+|---|---|
+| `18px` | window / surface luar: `decoration`, `window.ssd decoration`, `window.ssd headerbar.titlebar`, `window.csd decoration` |
+| `20px` | sheet: `menu`/`.popup`/`.context-menu`, `popover`, `.popup-menu-content`, `.menu`, `.notification` |
+| `14px` | `entry`/`textview text`/`.view`, `row`, tile |
+| `12px` | `menuitem`, `tooltip` |
+| `22px` | panel pill (`.panel-*`), `.info-osd`, `.osd` |
+| `999px` | chip/pill: `button`, `spinbutton`, `.sidebar row`, `.applet-box`, `.window-list-item-box`, `switch`, `.clock-widget`, scrollbar/slider |
+
+Ritme spasi 4px: `row` `8px 12px`, `button` `7px 16px` (min-height 30), `menuitem` `8px 14px`,
+headerbar CSD `min-height: 46px`. Hover menu **tonal** (`rgba(76,127,208,.18)`), bukan accent
+penuh — row yang terisi penuh terbaca "selected", padahal itu state lain.
 Tebal garis: 1px, kecuali indikator aktif taskbar 2px.
 
 ## 2. Permukaan & efek
 
 | Permukaan | File | Efek | Catatan |
 |---|---|---|---|
-| Panel bawah | `cinnamon/cinnamon.css` `.panel-bottom` | `rgba(236,238,241,.78)` + `background-blur: 14`, radius 18, margin 8 → melayang | blur di sini yang paling mahal; kalau frame rate turun saat jendela lewat, turunkan ke `background-blur: 6` atau hapus |
-| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 16, search pill | `background-blur` itu parse int, jadi `12` bukan `12px` |
-| Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 16 | permukaan statis → aman |
-| Frame window (SSD) | `gtk-3.0/gtk.css` `window.ssd decoration` + `window.ssd headerbar.titlebar` | radius 14 di **kedua** node, shadow, titlebutton bulat | Muffin membaca radius dari titlebar (lihat `docs/SAFETY.md` §3) |
+| Panel bawah | `cinnamon/cinnamon.css` `.panel-bottom` | `rgba(236,238,241,.78)` + `background-blur: 14`, radius 22, margin 10 → melayang | blur di sini yang paling mahal; kalau frame rate turun saat jendela lewat, turunkan ke `background-blur: 6` atau hapus |
+| Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 20, search pill | `background-blur` itu parse int, jadi `12` bukan `12px` |
+| Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 20 (OSD 22) | permukaan statis → aman |
+| Frame window (SSD) | `gtk-3.0/gtk.css` `window.ssd decoration` + `window.ssd headerbar.titlebar` | radius 18 di **kedua** node, shadow `0 10px 28px 2px`, titlebutton bulat | Muffin membaca radius dari titlebar (lihat `docs/SAFETY.md` §3) |
 | Headerbar CSD | `gtk-3.0/gtk.css` `headerbar` | permukaan datar, border bawah tipis | untuk app GTK yang menggambar titlebar sendiri |
 | Window "glass" | `gtk-3.0/gtk-translucent.css` (opt-in) | translucent, **tanpa** blur | sadar batas: ini palsu; beberapa app akan smear |
 
@@ -158,7 +171,10 @@ Kalau mau sama persis, dua jalur yang jujur:
   (`--iris-panel-height`), dan itu ditunjukkan di header CSS hasil generate.
 - `preview-base.css` isinya geometri mock saja (flex/grid/posisi + chrome situs). Warna,
   radius, border, shadow sengaja tidak ada di situ, supaya "elemen X tampil polos" berarti
-  temanya memang tidak punya rule buat X.
+  temanya memang tidak punya rule buat X. Chrome situsnya sendiri sengaja **terang**:
+  Iris tema terang dan banyak surface-nya `transparent` by design (menuitem, row,
+  `.cs-category-view`), jadi di panggung gelap teksnya hilang dan mock terbaca rusak —
+  itu bug panggung, bukan sinyal soal tema.
 
 ### 8.1 Audit reachability — kenapa GUI-nya nggak boleh "kira-kira"
 

@@ -8,6 +8,10 @@
  * theme. If a mock element looks unstyled, that is the honest answer — the
  * theme has no rule for it.
  *
+ * The chrome (site background, cards, tables) is light on purpose: Iris is a light
+ * theme and leaves many surfaces deliberately transparent, so on a dark stage those
+ * elements would render as invisible text and read as "the theme is broken".
+ *
  * Two exceptions, both derived from repo data rather than invented:
  *   --iris-panel-height  read from config/gsettings/iris.gsettings
  *   --iris-icon-size     copied from `icon-size` in cinnamon.css
@@ -18,16 +22,19 @@
 html, body {
   margin: 0;
   height: 100%;
-  background: #12161d;
-  color: #e8ecf2;
+  background: #f4f5f8;
+  color: #1c2129;
   font: 13px/1.45 ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  /* the theme is light, so the room it is shown in is light too: elements the
+   * theme leaves transparent would otherwise vanish on a dark background */
 }
 
 .desk {
   position: absolute;
   inset: 0 320px 0 0;
   overflow: hidden;
-  background: #20242c;
+  background: #cfd6e0;
+  color: #1c2129;
 }
 
 .wallpaper { position: absolute; inset: 0; }
@@ -242,8 +249,8 @@ html, body {
   top: 0;
   font: 9px/1 ui-monospace, monospace;
   padding: 1px 3px;
-  background: #ffe600;
-  color: #12161d;
+  background: #ffe98a;
+  color: #1c2129;
   border-radius: 2px;
   opacity: .85;
   pointer-events: none;
@@ -262,51 +269,52 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #171b23;
-  border-left: 1px solid #262c37;
+  background: #fbfcfd;
+  border-left: 1px solid #dde2ea;
   overflow: auto;
 }
 .ctl-head { display: flex; flex-direction: column; }
 .ctl-head b { font-size: 15px; }
-.ctl-head small { color: #93a0b4; }
+.ctl-head small { color: #5b6675; }
 .controls label { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .controls label > input[type=range] { flex: 1 1 120px; }
-.controls output { color: #9fd0ff; font-variant-numeric: tabular-nums; }
-.controls select { flex: 1 1 100%; background: #0f1319; color: inherit; border: 1px solid #2b3341; }
+.controls output { color: #2c5fa8; font-variant-numeric: tabular-nums; }
+.controls select { flex: 1 1 100%; background: #fff; color: inherit; border: 1px solid #cfd6e0; border-radius: 8px; padding: 3px 6px; }
 .toggles { display: flex; flex-direction: column; gap: 4px; }
 .tabs { display: flex; gap: 4px; }
 .tabs a {
   flex: 1 1 auto;
   text-align: center;
   padding: 5px 8px;
-  border: 1px solid #2b3341;
-  border-radius: 8px;
-  color: #cdd7e5;
+  border: 1px solid #cfd6e0;
+  border-radius: 999px;
+  color: #3a4658;
   text-decoration: none;
 }
-.tabs a.on { background: #2b3341; color: #fff; }
-.warn { color: #93a0b4; font-size: 12px; }
-.warn a { color: #9fd0ff; }
+.tabs a.on { background: #e2e8f2; color: #16202e; border-color: #b9c6da; }
+.warn { color: #5b6675; font-size: 12px; }
+.warn a { color: #2c5fa8; }
 
 .doc { position: absolute; inset: 0 320px 0 0; overflow: auto; padding: 18px 22px 60px; }
 .doc h2 { margin: 22px 0 6px; font-size: 15px; }
 .doc h2:first-child { margin-top: 0; }
-.doc .lead { color: #93a0b4; max-width: 78ch; }
+.doc .lead { color: #5b6675; max-width: 78ch; }
 .doc table { border-collapse: collapse; width: 100%; font-size: 12px; }
-.doc th, .doc td { text-align: left; padding: 5px 8px; border-bottom: 1px solid #232935; vertical-align: top; }
-.doc td.props code { color: #a8dcbd; }
+.doc th, .doc td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e6eaf0; vertical-align: top; }
+.doc th { color: #5b6675; font-weight: 600; }
+.doc td.props code { color: #1f6b4a; }
 .doc code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
 .doc ul { padding-left: 18px; }
 .doc li { margin: 3px 0; }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
 .sw { display: flex; align-items: center; gap: 8px; }
-.sw i { width: 22px; height: 22px; border-radius: 6px; border: 1px solid #2b3341; display: inline-block; }
-ol.src { list-style: none; margin: 0; padding: 0; font-size: 11.5px; background: #0f1319; border: 1px solid #232935; border-radius: 10px; }
+.sw i { width: 22px; height: 22px; border-radius: 8px; border: 1px solid #cfd6e0; display: inline-block; }
+ol.src { list-style: none; margin: 0; padding: 0; font-size: 11.5px; background: #fff; border: 1px solid #e2e6ec; border-radius: 14px; }
 ol.src li { display: flex; gap: 10px; padding: 0 8px; white-space: pre; }
-ol.src li .no { color: #4a5568; min-width: 3.5ch; text-align: right; user-select: none; }
-ol.src li.hit { background: rgba(76, 127, 208, .22); }
-ol.src code { color: #c8d3e2; }
-.deviations li { color: #e8c07a; }
+ol.src li .no { color: #9aa5b4; min-width: 3.5ch; text-align: right; user-select: none; }
+ol.src li.hit { background: rgba(44, 95, 168, .12); }
+ol.src code { color: #31404f; }
+.deviations li { color: #8a5a12; }
 
 /* ---- panel nodes, named as cinnamon names them -------------------------- */
 .t-panel-launchers, .t-launcher { display: flex; align-items: center; }
@@ -339,10 +347,11 @@ ol.src code { color: #c8d3e2; }
   align-items: start;
 }
 .card {
-  border: 1px solid #232935;
-  border-radius: 10px;
-  padding: 10px 12px 12px;
-  background: #14181f;
+  border: 1px solid #e2e6ec;
+  border-radius: 18px;
+  padding: 12px 14px 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 33, 41, 0.05);
   min-width: 0;
 }
 .card h3 {
@@ -350,14 +359,14 @@ ol.src code { color: #c8d3e2; }
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .08em;
-  color: #93a0b4;
+  color: #5b6675;
 }
-.card-title { margin: 0 0 8px; font-size: 11px; color: #93a0b4; }
+.card-title { margin: 0 0 8px; font-size: 11px; color: #5b6675; }
 .card .row,
 .card .boxlist { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .card .boxlist { flex-direction: column; align-items: stretch; }
 .card .thumb { display: grid; place-items: center; width: 30px; height: 22px; }
-.card .note { font-size: 11px; color: #93a0b4; }
+.card .note { font-size: 11px; color: #5b6675; }
 .card .t-window,
 .card .t-notification,
 .card .t-menu,
@@ -375,18 +384,19 @@ ol.src code { color: #c8d3e2; }
 .card .t-window { display: inline-flex; flex-direction: column; min-width: 220px; }
 .card .t-decoration { height: auto; }
 .card .t-panel { align-items: stretch; padding: 0 6px; }
-.hint { font-size: 11px; color: #93a0b4; margin: 6px 0 0; max-width: 60ch; }
+.hint { font-size: 11px; color: #5b6675; margin: 6px 0 0; max-width: 60ch; }
 .panelrow { display: flex; align-items: center; gap: 6px; height: 40px; }
 .demo {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 6px;
-  border: 1px dashed #232935;
-  border-radius: 8px;
+  padding: 8px;
+  border: 1px dashed #c3cddd;
+  border-radius: 14px;
+  background: #f7f9fc;
   min-width: 0;
 }
-.demo > code { color: #7f8ca1; font-size: 10.5px; word-break: break-all; }
+.demo > code { color: #5b6675; font-size: 10.5px; word-break: break-all; }
 .demo > div { display: flex; flex-direction: column; gap: 4px; padding: 4px 6px; }
 .t-check, .t-radio { width: 16px; height: 16px; flex: 0 0 auto; }
 .t-checkbutton, .t-radiobutton { display: flex; align-items: center; gap: 8px; }

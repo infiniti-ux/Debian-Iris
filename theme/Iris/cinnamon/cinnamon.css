@@ -62,27 +62,27 @@ StScrollBar StButton#hhandle:hover {
 }
 
 .panel-top {
-    border-radius: 0 0 18px 18px;
+    border-radius: 0 0 22px 22px;
     border-top-width: 0;
 }
 
 .panel-bottom {
     /* floating bar: the margins are what detach it from the screen edge */
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    border-radius: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 22px;
     border-bottom-width: 0;
-    box-shadow: 0 -1px 10px 0 rgba(40, 48, 62, 0.14);
+    box-shadow: 0 -1px 14px 0 rgba(40, 48, 62, 0.16);
 }
 
 .panel-left {
-    border-radius: 0 18px 18px 0;
+    border-radius: 0 22px 22px 0;
     border-left-width: 0;
 }
 
 .panel-right {
-    border-radius: 18px 0 0 18px;
+    border-radius: 22px 0 0 22px;
     border-right-width: 0;
 }
 
@@ -117,8 +117,8 @@ StScrollBar StButton#hhandle:hover {
 
 /* ===== 2. Applets (generic) =============================================== */
 .applet-box {
-    padding: 4px 8px;
-    border-radius: 12px;
+    padding: 6px 11px;
+    border-radius: 999px;
     color: #1f2430;
     font-weight: normal;
 }
@@ -183,9 +183,9 @@ StScrollBar StButton#hhandle:hover {
 
 .window-list-item-box,
 .grouped-window-list-item-box {
-    padding: 4px 10px;
-    margin: 3px 1px;
-    border-radius: 12px;
+    padding: 5px 14px;
+    margin: 4px 1px;
+    border-radius: 999px;
     color: #1f2430;
     border: 1px solid transparent;
     border-bottom-width: 2px;
@@ -265,7 +265,7 @@ StScrollBar StButton#hhandle:hover {
 /* ===== 5. Menus (start menu, applet dropdowns, calendar) ================= */
 .popup-menu-content {
     border: 1px solid rgba(190, 196, 205, 0.9);
-    border-radius: 16px;
+    border-radius: 20px;
     background-color: rgba(246, 247, 249, 0.90);
     background-blur: 12;
     box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.22);
@@ -274,8 +274,8 @@ StScrollBar StButton#hhandle:hover {
 }
 
 .popup-menu-item {
-    padding: 6px 12px;
-    border-radius: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
     spacing: 8px;
     color: #1f2430;
 }
@@ -337,13 +337,13 @@ StScrollBar StButton#hhandle:hover {
 
 /* the start menu itself (menu@cinnamon.org / Cinnamenu) */
 .menu {
-    border-radius: 16px;
+    border-radius: 20px;
 }
 
 #menu-search-entry,
 #appmenu-search-entry {
     width: 22em;
-    padding: 7px 12px;
+    padding: 9px 16px;
     border: 1px solid rgba(190, 196, 205, 0.9);
     border-radius: 999px;
     background-color: rgba(255, 255, 255, 0.85);
@@ -400,8 +400,8 @@ StScrollBar StButton#hhandle:hover {
  * (`.calendar-day-selected` / `.datemenu-*` do not exist — those are GNOME's.)
  */
 .clock-widget {
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
 }
 
 .clock-time-label {
@@ -425,8 +425,8 @@ StScrollBar StButton#hhandle:hover {
 
 .calendar-day-base {
     text-align: center;
-    width: 2.4em;
-    height: 2.4em;
+    width: 2.6em;
+    height: 2.6em;
     font-size: 9pt;
     border-radius: 9999px;
     color: rgba(31, 36, 48, 0.75);
@@ -531,9 +531,9 @@ StScrollBar StButton#hhandle:hover {
 .notification,
 #notification {
     width: 28em;
-    padding: 10px 12px;
+    padding: 12px 16px;
     border: 1px solid rgba(190, 196, 205, 0.9);
-    border-radius: 16px;
+    border-radius: 20px;
     background-color: rgba(246, 247, 249, 0.90);
     background-blur: 12;
     box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.20);
@@ -580,9 +580,9 @@ StScrollBar StButton#hhandle:hover {
 .info-osd,
 .media-keys-osd,
 .workspace-switch-osd {
-    padding: 12px 16px;
+    padding: 14px 20px;
     border: 1px solid rgba(190, 196, 205, 0.9);
-    border-radius: 16px;
+    border-radius: 22px;
     background-color: rgba(246, 247, 249, 0.88);
     background-blur: 12;
     box-shadow: 0 6px 24px 0 rgba(40, 48, 62, 0.20);
