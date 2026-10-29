@@ -21,6 +21,17 @@ cd Debian-Iris
 
 make check                     # validasi statis: selector, schema, desktop file, shell
 make preview                   # lihat hasilnya di browser, di-generate dari file CSS-nya
+make rice                      # pakai skin-nya di sesi Cinnamon kamu, tanpa root/.deb/ISO
+make unrice                    # kembalikan semua yang diubah `make rice`
+```
+
+`make rice` cuma dua hal: symlink `~/.themes/Iris` ke checkout ini, lalu tulis profil gsettings
+ke sesi yang sedang jalan (nilai lamamu di-backup dulu, efeknya live tanpa logout). Bukan
+instalasi sistem — kalau Cinnamon-mu dari distro dan sudah jalan, ini jalur yang benar.
+
+Butuh sesi login sendiri + entry LightDM + `.deb` (jalur turunan distro)? Baru pakai installer:
+
+```bash
 sudo ./scripts/install.sh --dry-run --with-session --with-lightdm   # lihat rencana, tidak menulis
 sudo ./scripts/install.sh --all
 ```
