@@ -152,6 +152,17 @@ StScrollBar StButton#hhandle:hover {
     background-color: rgba(255, 255, 255, 0.22);
 }
 
+/* The top bar is 30px tall (gsettings) while .applet-box/.clock-widget padding
+ * was cut for the 44-60px taskbar: un-slimmed, the clock (two labels plus two
+ * nested paddings) spills out of the bar. Real-rice fix, not mock-only. */
+.panel-top .applet-box {
+    padding: 1px 8px;
+}
+
+.panel-top .clock-widget {
+    padding: 0 4px;
+}
+
 /* ===== 2. Applets (generic) =============================================== */
 .applet-box {
     padding: 6px 11px;

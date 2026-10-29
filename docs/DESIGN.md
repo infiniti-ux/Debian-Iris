@@ -45,7 +45,7 @@ Tebal garis: 1px, kecuali indikator aktif taskbar 2px.
 
 | Permukaan | File | Efek | Catatan |
 |---|---|---|---|
-| Panel atas (30px) | `cinnamon/cinnamon.css` `.panel-top` | `rgba(15,17,23,.55)` + `background-blur: 10`, full-bleed, teks `#f2f4f7` via rule turunan `.panel-top …` | jam kiri + tray kanan; teks gelap base di-override semua — kalau ada yang ke-skip, bug-nya teks hilang di bar gelap |
+| Panel atas (30px) | `cinnamon/cinnamon.css` `.panel-top` | `rgba(15,17,23,.55)` + `background-blur: 10`, full-bleed, teks `#f2f4f7` + padding ramping (`1px 8px` / `0 4px`) via rule turunan `.panel-top …` | jam kiri + tray kanan; teks gelap base di-override semua — kalau ada yang ke-skip, bug-nya teks hilang di bar gelap |
 | Taskbar bawah (60px) | `.panel-bottom` | putih `rgba(255,255,255,.97)`, `background-blur: 0`, hairline atas | menu + separator + grouped-window-list di tengah; state aktif/fokus tonal biru, bukan wash putih (nggak kelihatan di bar putih) |
 | Menu applet & start menu | `.popup-menu-content`, `#menu-search-entry` | blur 12, radius 24, sheet lavender `rgba(224,227,234,.96)`, search pill putih | `background-blur` itu parse int, jadi `12` bukan `12px` |
 | Notifikasi / OSD | `.notification`, `#notification`, `.info-osd`, `.switcher-list` | blur 12, radius 20 (OSD 22) | permukaan statis → aman |
@@ -196,4 +196,4 @@ yang bolong. Jadi `tools/preview.py` punya audit:
 gagal juga kalau jumlah auto-demo lewat `--max-demo 60` — naiknya angka itu artinya rule tema
 berhenti mendarat di widget sungguhan (class di-rename upstream, atau node yang nggak pernah
 dibangun), dan yang rusak pertama kali adalah desktopnya, bukan auditnya. Angka hari ini:
-343 rule dipetakan, 32 cuma lewat auto-demo, 0 unreachable.
+345 rule dipetakan, 32 cuma lewat auto-demo, 0 unreachable.

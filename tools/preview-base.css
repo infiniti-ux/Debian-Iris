@@ -19,6 +19,12 @@
 
 * { box-sizing: border-box; }
 
+:root {
+  /* taskbar height, honoring panels-height '2:60' in iris.gsettings
+   * (the 30px top bar overrides this in .rice-topbar) */
+  --iris-panel-height: 60px;
+}
+
 html, body {
   margin: 0;
   height: 100%;
@@ -151,8 +157,9 @@ html, body {
 .menu-cats, .menu-apps { display: flex; flex-direction: column; }
 .menu-apps { display: grid; grid-template-columns: repeat(4, 1fr); align-content: start; }
 .menu-footer { display: flex; gap: 6px; justify-content: flex-end; }
-.t-app-well { display: flex; align-items: center; gap: 8px; }
-.t-app-well .glyph { font-size: 1.4em; }
+.t-app-well { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; padding: 6px 2px; }
+.t-app-well .glyph { font-size: 2em; line-height: 1; }
+.t-app-well .t-label { font-size: 9pt; }
 /* Desktop icon labels are painted white by the GTK theme because they sit on the
  * dark wallpaper; the well stands in for that wallpaper in the Components tab so
  * the rule can be judged. The colour is the profile's
@@ -177,7 +184,7 @@ html, body {
   top: auto;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 12%;
+  bottom: 72px; /* fixed gap above the 60px taskbar — a % floats with viewport height */
   width: 480px;
   z-index: 7;
 }
@@ -220,6 +227,11 @@ html, body {
 /* the rice's fixed top bar is 30px while the taskbar is 60px (gsettings
  * panels-height); the mock honours both so the proportions judge honestly */
 .rice-topbar { height: 30px; }
+/* topbar zones carry different ids than the main panel, so the #t-panelLeft-type
+ * flex rules never reach them — without this the tray leans left with the clock */
+.rice-topbar .t-panel-left, .rice-topbar .t-panel-right { flex: 0 0 auto; }
+.rice-topbar .t-panel-center { flex: 1 1 auto; }
+.rice-topbar .t-clock-widget { align-items: flex-start; }
 .t-panel-left, .t-panel-right {
   top: 0;
   bottom: 0;
@@ -333,6 +345,7 @@ ol.src code { color: #31404f; }
 /* ---- panel nodes, named as cinnamon names them -------------------------- */
 .t-panel-launchers, .t-launcher { display: flex; align-items: center; }
 .t-window-list { display: flex; align-items: center; gap: 4px; }
+.t-window-list-item-box { white-space: nowrap; }
 .t-window-list-item-box, .t-grouped-window-list-item-box {
   display: flex;
   align-items: center;

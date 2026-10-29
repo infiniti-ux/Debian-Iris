@@ -426,14 +426,14 @@ def panel_html(gen: Gen) -> str:
     launchers = "".join(
         f'<div class="t-launcher"><div class="t-applet-box">'
         f'<span class="glyph t-applet-icon">{g}</span></div></div>'
-        for g in ["🗔", "🗑", "🌐"])
+        for g in ["▤", "▣", "◍"])
     tiles = "".join(
         f'<div class="t-window-list-item-box{ " " + extra if extra else ""}">'
         f'<span class="glyph t-applet-icon">{"▤▣▦▨"[i % 4]}</span>'
         f'<span class="t-window-list-item-label window-list-label">{name}</span></div>'
         for i, (name, extra) in enumerate([
             ("Files", ""), ("Settings", "is-focused"),
-            ("Mozilla Firefox", "is-urgent"), ("Text Editor", ""),
+            ("Firefox", "is-urgent"), ("Text Editor", ""),
         ]))
     corner = ('<div class="t-panel-corner"></div>' if not vertical else
               '<div class="t-panel-corner t-panel-corner-left"></div>')
@@ -465,7 +465,7 @@ def panel_html(gen: Gen) -> str:
   </div>
   <div class="t-panel-center{dnd}" id="t-panelCenter">
     <div class="t-applet-box t-panel-menu-button">
-      <span class="glyph t-applet-icon">◉</span>
+      <span class="glyph t-applet-icon">▦</span>
     </div>
     <div class="t-applet-separator"><span class="t-applet-separator-line"></span></div>
     <div class="t-panel-launchers">{launchers}</div>
@@ -674,9 +674,9 @@ def menu_html() -> str:
     cats = "".join(f'<div class="t-popup-menu-item {c}"><span class="t-label">{n}</span></div>'
                    for n, c in [("Places", ""), ("Recent", ""), ("Favorites", "is-selected"),
                                 ("All apps", "")])
-    apps = "".join(f'<div class="t-app-well"><span class="glyph">{g}</span>'
+    apps = "".join(f'<div class="t-app-well t-appmenu-application-button"><span class="glyph">{g}</span>'
                    f'<span class="t-label">{n}</span></div>'
-                   for g, n in [("", "System Settings"), ("", "Files"), ("", "Trash"),
+                   for g, n in [("⚙", "System Settings"), ("▤", "Files"), ("⌫", "Trash"),
                                 ("⎙", "Printers"), ("⛨", "Firewall"), ("⏻", "Power off")])
     return f"""
 <div class="t-menu t-popup-menu-content popup-menu" id="t-menu">
